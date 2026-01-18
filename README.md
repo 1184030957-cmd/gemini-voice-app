@@ -7,17 +7,36 @@
 - 自动识别语音转文字
 - 调用 Gemini API 对话
 - 语音播放回复
+- **API Key 在 App 内配置，安全存储在本地**
 
 ## 如何使用
 
-### 方法 1：下载已打包的 APK（最简单）
-1. 等待 GitHub Actions 自动打包完成（推送代码后约 10 分钟）
-2. 进入仓库的 Actions 页面
-3. 点击最新的 workflow run
-4. 下载 `gemini-voice-app` 文件
-5. 传到手机安装
+### 下载安装
+1. 进入仓库的 [Actions](../../actions) 页面
+2. 点击最新的成功运行（绿色勾 ✓）
+3. 下载 `gemini-voice-app` 文件
+4. 解压得到 `app-release.apk`
+5. 传到手机安装（需允许"未知来源"）
 
-### 方法 2：本地打包
+### 首次使用
+1. 打开 App
+2. 填写配置信息：
+   - **API 地址**：你的 API 服务地址（已预填默认值）
+   - **API Key**：你的 API 密钥
+   - **模型名称**：使用的模型（已预填默认值）
+3. 点击"保存并开始使用"
+4. 配置会保存在手机本地，以后无需重复输入
+
+### 修改配置
+- 点击右上角设置图标
+- 重新输入配置信息
+
+## 安全说明
+- ✅ API Key **不在代码中**，可安全公开仓库
+- ✅ Key 保存在手机本地，加密存储
+- ✅ 每个用户使用自己的 Key
+
+## 本地打包（可选）
 需要安装 Flutter SDK：
 ```bash
 flutter pub get
@@ -25,43 +44,9 @@ flutter build apk --release
 ```
 APK 位置：`build/app/outputs/flutter-apk/app-release.apk`
 
-## 修改 API 配置
-编辑 `lib/main.dart` 第 24-26 行：
-```dart
-final String apiUrl = "你的API地址";
-final String apiKey = "你的API密钥";
-final String model = "模型名称";
-```
-
-## 上传到 GitHub 步骤
-
-### 1. 创建 GitHub 仓库
-- 访问 github.com，登录
-- 点击右上角 "+" → "New repository"
-- 仓库名随意（如：gemini-voice-app）
-- 选择 Public（公开仓库才能免费用 Actions）
-- 不要勾选任何初始化选项
-- 点击 "Create repository"
-
-### 2. 上传代码
-在当前文件夹打开终端，执行：
-```bash
-cd gemini_voice_app
-git init
-git add .
-git commit -m "Initial commit"
-git branch -M main
-git remote add origin https://github.com/你的用户名/你的仓库名.git
-git push -u origin main
-```
-
-### 3. 等待自动打包
-- 推送后自动开始打包
-- 进入仓库页面 → Actions 标签
-- 等待绿色勾（约 10 分钟）
-- 点击进入 → 下载 APK
+## 更新 App
+修改代码后推送到 GitHub，Actions 会自动打包新版本，下载后覆盖安装即可。
 
 ## 注意事项
 - 首次使用需要授权麦克风权限
 - 需要联网使用
-- API Key 已写在代码里，仅供个人使用
