@@ -38,9 +38,9 @@ class _ConfigPageState extends State<ConfigPage> {
 
   Future<void> _loadConfig() async {
     final prefs = await SharedPreferences.getInstance();
-    final apiUrl = prefs.getString('https://doubao.zwchat.cn/v1/chat/completions');
+    final apiUrl = prefs.getString('api_url');
     final apiKey = prefs.getString('api_key');
-    final model = prefs.getString('gemini-3-flash-preview');
+    final model = prefs.getString('model');
 
     if (apiUrl != null && apiKey != null && model != null) {
       // 已有配置，直接进入聊天页面
