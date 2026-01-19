@@ -20,6 +20,12 @@ class MyApp extends StatelessWidget {
 
 // 配置页面 - 首次打开或修改设置
 class ConfigPage extends StatefulWidget {
+  final String? initialApiUrl;
+  final String? initialApiKey;
+  final String? initialModel;
+
+  ConfigPage({this.initialApiUrl, this.initialApiKey, this.initialModel});
+
   @override
   _ConfigPageState createState() => _ConfigPageState();
 }
@@ -41,6 +47,15 @@ class _ConfigPageState extends State<ConfigPage> {
     final apiUrl = prefs.getString('api_url');
     final apiKey = prefs.getString('api_key');
     final model = prefs.getString('model');
+
+    // 如果有传入的初始值，使用初始值
+    if (widget.initialApiUrl != null) {
+      _apiUrlController.text = widget.initialApiUrl!;
+      _apiKeyController.text = widget.initialApiKey!;
+      _modelController.text = widget.initialModel!;
+      setState(() => _isLoading = false);
+      return;
+    }
 
     if (apiUrl != null && apiKey != null && model != null) {
       // 已有配置，直接进入聊天页面
@@ -161,6 +176,7 @@ class _VoiceChatPageState extends State<VoiceChatPage> {
   String _statusText = "点击麦克风开始说话";
   bool _isListening = false;
   bool _isProcessing = false;
+  bool _speechAvailable = false;
 
   @override
   void initState() {
@@ -170,7 +186,22 @@ class _VoiceChatPageState extends State<VoiceChatPage> {
   }
 
   void _initSpeech() async {
-    await _speech.initialize();
+    bool available = await _speech.initialize(
+      onError: (error) {
+        setState(() {
+          _statusText = "语音识别错误: ${error.errorMsg}";
+        });
+      },
+      onStatus: (status) {
+        print("语音识别状态: $status");
+      },
+    );
+    setState(() {
+      _speechAvailable = available;
+      if (!available) {
+        _statusText = "语音识别不可用，请检查麦克风权限";
+      }
+    });
   }
 
   void _initTts() async {
@@ -179,28 +210,47 @@ class _VoiceChatPageState extends State<VoiceChatPage> {
   }
 
   void _startListening() async {
-    if (!_isListening) {
+    if (!_speechAvailable) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('语音识别不可用，请检查麦克风权限')),
+      );
+      return;
+    }
+
+    if (!_isListening && !_isProcessing) {
       bool available = await _speech.initialize();
       if (available) {
         setState(() {
           _isListening = true;
           _statusText = "正在听...";
         });
-        _speech.listen(onResult: (result) {
-          if (result.finalResult) {
-            _sendMessage(result.recognizedWords);
-          }
-        });
+        _speech.listen(
+          onResult: (result) {
+            if (result.finalResult) {
+              _stopListening();
+              _sendMessage(result.recognizedWords);
+            }
+          },
+          listenFor: Duration(seconds: 30),
+          pauseFor: Duration(seconds: 3),
+          localeId: "zh_CN",
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('无法启动语音识别')),
+        );
       }
     }
   }
 
   void _stopListening() {
-    _speech.stop();
-    setState(() {
-      _isListening = false;
-      _statusText = "点击麦克风开始说话";
-    });
+    if (_isListening) {
+      _speech.stop();
+      setState(() {
+        _isListening = false;
+        _statusText = "点击麦克风开始说话";
+      });
+    }
   }
 
   Future<void> _sendMessage(String text) async {
@@ -254,12 +304,21 @@ class _VoiceChatPageState extends State<VoiceChatPage> {
     }
   }
 
-  Future<void> _clearConfig() async {
+  Future<void> _editConfig() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.clear();
+    final apiUrl = prefs.getString('api_url') ?? '';
+    final apiKey = prefs.getString('api_key') ?? '';
+    final model = prefs.getString('model') ?? '';
+
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => ConfigPage()),
+      MaterialPageRoute(
+        builder: (context) => ConfigPage(
+          initialApiUrl: apiUrl,
+          initialApiKey: apiKey,
+          initialModel: model,
+        ),
+      ),
     );
   }
 
@@ -271,8 +330,8 @@ class _VoiceChatPageState extends State<VoiceChatPage> {
         actions: [
           IconButton(
             icon: Icon(Icons.settings),
-            onPressed: _clearConfig,
-            tooltip: '重新配置',
+            onPressed: _editConfig,
+            tooltip: '修改配置',
           ),
         ],
       ),
