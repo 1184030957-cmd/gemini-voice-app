@@ -171,6 +171,7 @@ class VoiceChatPage extends StatefulWidget {
 class _VoiceChatPageState extends State<VoiceChatPage> {
   final SpeechToText _speech = SpeechToText();
   final FlutterTts _tts = FlutterTts();
+  final TextEditingController _textController = TextEditingController();
 
   List<Map<String, String>> _messages = [];
   String _statusText = "点击麦克风开始说话";
@@ -186,22 +187,39 @@ class _VoiceChatPageState extends State<VoiceChatPage> {
   }
 
   void _initSpeech() async {
-    bool available = await _speech.initialize(
-      onError: (error) {
-        setState(() {
-          _statusText = "语音识别错误: ${error.errorMsg}";
-        });
-      },
-      onStatus: (status) {
-        print("语音识别状态: $status");
-      },
-    );
-    setState(() {
-      _speechAvailable = available;
-      if (!available) {
-        _statusText = "语音识别不可用，请检查麦克风权限";
-      }
-    });
+    try {
+      bool available = await _speech.initialize(
+        onError: (error) {
+          print("语音识别错误: ${error.errorMsg}");
+          setState(() {
+            _statusText = "语音错误: ${error.errorMsg}";
+          });
+        },
+        onStatus: (status) {
+          print("语音识别状态: $status");
+          if (status == "notListening") {
+            setState(() {
+              _isListening = false;
+            });
+          }
+        },
+      );
+
+      print("语音识别初始化结果: $available");
+
+      setState(() {
+        _speechAvailable = available;
+        if (!available) {
+          _statusText = "语音识别不可用\n可能需要安装 Google 语音输入\n或使用文字输入";
+        }
+      });
+    } catch (e) {
+      print("语音识别初始化异常: $e");
+      setState(() {
+        _speechAvailable = false;
+        _statusText = "语音识别初始化失败: $e";
+      });
+    }
   }
 
   void _initTts() async {
@@ -363,22 +381,54 @@ class _VoiceChatPageState extends State<VoiceChatPage> {
             padding: EdgeInsets.all(16),
             child: Column(
               children: [
-                Text(_statusText, style: TextStyle(fontSize: 16)),
-                SizedBox(height: 16),
+                Text(_statusText, style: TextStyle(fontSize: 14), textAlign: TextAlign.center),
+                SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _textController,
+                        decoration: InputDecoration(
+                          hintText: '输入消息...',
+                          border: OutlineInputBorder(),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        ),
+                        onSubmitted: (text) {
+                          if (text.isNotEmpty) {
+                            _sendMessage(text);
+                            _textController.clear();
+                          }
+                        },
+                      ),
+                    ),
+                    SizedBox(width: 8),
+                    IconButton(
+                      icon: Icon(Icons.send),
+                      onPressed: () {
+                        if (_textController.text.isNotEmpty) {
+                          _sendMessage(_textController.text);
+                          _textController.clear();
+                        }
+                      },
+                      color: Colors.blue,
+                    ),
+                  ],
+                ),
+                SizedBox(height: 12),
                 GestureDetector(
                   onTapDown: (_) => _startListening(),
                   onTapUp: (_) => _stopListening(),
                   child: Container(
-                    width: 80,
-                    height: 80,
+                    width: 70,
+                    height: 70,
                     decoration: BoxDecoration(
-                      color: _isListening ? Colors.red : Colors.blue,
+                      color: _isListening ? Colors.red : (_speechAvailable ? Colors.blue : Colors.grey),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
                       Icons.mic,
                       color: Colors.white,
-                      size: 40,
+                      size: 35,
                     ),
                   ),
                 ),
