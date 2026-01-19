@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'dart:convert';
 
 void main() => runApp(MyApp());
@@ -190,6 +191,17 @@ class _VoiceChatPageState extends State<VoiceChatPage> {
 
   void _initSpeech() async {
     try {
+      // 先请求麦克风权限
+      final status = await Permission.microphone.request();
+
+      if (!status.isGranted) {
+        setState(() {
+          _speechAvailable = false;
+          _statusText = "麦克风权限被拒绝\n请在设置中允许麦克风权限\n或使用文字输入";
+        });
+        return;
+      }
+
       bool available = await _speech.initialize(
         onError: (error) {
           print("语音识别错误: ${error.errorMsg}");
@@ -213,13 +225,15 @@ class _VoiceChatPageState extends State<VoiceChatPage> {
         _speechAvailable = available;
         if (!available) {
           _statusText = "语音识别不可用\n可能需要安装 Google 语音输入\n或使用文字输入";
+        } else {
+          _statusText = "点击麦克风开始说话";
         }
       });
     } catch (e) {
       print("语音识别初始化异常: $e");
       setState(() {
         _speechAvailable = false;
-        _statusText = "语音识别初始化失败: $e";
+        _statusText = "语音识别初始化失败\n请使用文字输入";
       });
     }
   }
@@ -391,27 +405,31 @@ class _VoiceChatPageState extends State<VoiceChatPage> {
                   child: Text('取消'),
                 ),
                 ElevatedButton(
-                  onPressed: () async {
+                  onPressed: () {
                     Navigator.pop(context);
                     // 使用镜像加速下载
                     final mirrorUrl = 'https://ghproxy.com/$downloadUrl';
-                    final uri = Uri.parse(mirrorUrl);
 
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('正在打开浏览器下载...')),
-                    );
+                    // 延迟执行，避免黑屏
+                    Future.delayed(Duration(milliseconds: 300), () async {
+                      try {
+                        final uri = Uri.parse(mirrorUrl);
+                        final launched = await launchUrl(
+                          uri,
+                          mode: LaunchMode.externalApplication,
+                        );
 
-                    try {
-                      if (await canLaunchUrl(uri)) {
-                        await launchUrl(uri, mode: LaunchMode.externalApplication);
-                      } else {
-                        throw Exception('无法打开下载链接');
+                        if (!launched) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('无法打开下载链接，请手动访问 GitHub Releases')),
+                          );
+                        }
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('打开下载失败，请手动访问 GitHub Releases')),
+                        );
                       }
-                    } catch (e) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('打开下载失败: $e')),
-                      );
-                    }
+                    });
                   },
                   child: Text('立即更新'),
                 ),

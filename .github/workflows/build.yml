@@ -46,11 +46,11 @@ jobs:
           tag_name: v${{ steps.version.outputs.VERSION }}
           name: Release ${{ steps.version.outputs.VERSION }}
           body: |
-            ## 更新内容
-            - 添加文字输入功能
-            - 改进语音识别错误提示
-            - 添加自动更新检查功能
-            - 修复设置按钮清空配置的问题
+            ## 更新内容 v1.0.2
+            - 修复点击更新按钮后黑屏的问题
+            - 改进语音识别权限请求
+            - 添加麦克风权限检查和提示
+            - 优化错误提示信息
           files: build/app/outputs/flutter-apk/app-release.apk
           draft: false
           prerelease: false
