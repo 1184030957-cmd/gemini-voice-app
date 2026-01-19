@@ -396,8 +396,21 @@ class _VoiceChatPageState extends State<VoiceChatPage> {
                     // 使用镜像加速下载
                     final mirrorUrl = 'https://ghproxy.com/$downloadUrl';
                     final uri = Uri.parse(mirrorUrl);
-                    if (await canLaunchUrl(uri)) {
-                      await launchUrl(uri, mode: LaunchMode.externalApplication);
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('正在打开浏览器下载...')),
+                    );
+
+                    try {
+                      if (await canLaunchUrl(uri)) {
+                        await launchUrl(uri, mode: LaunchMode.externalApplication);
+                      } else {
+                        throw Exception('无法打开下载链接');
+                      }
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('打开下载失败: $e')),
+                      );
                     }
                   },
                   child: Text('立即更新'),
