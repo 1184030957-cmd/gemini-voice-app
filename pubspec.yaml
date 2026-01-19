@@ -1,6 +1,6 @@
 name: gemini_voice_app
 description: Gemini Voice Chat App
-version: 1.0.0
+version: 1.0.1+2
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
@@ -13,6 +13,8 @@ dependencies:
   flutter_tts: ^3.8.5
   permission_handler: ^11.0.1
   shared_preferences: ^2.2.2
+  package_info_plus: ^5.0.1
+  url_launcher: ^6.2.2
 
 flutter:
   uses-material-design: true

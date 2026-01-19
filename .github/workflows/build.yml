@@ -29,8 +29,30 @@ jobs:
       - name: Build APK
         run: flutter build apk --release
 
+      - name: Get version
+        id: version
+        run: echo "VERSION=$(grep 'version:' pubspec.yaml | cut -d ' ' -f 2 | cut -d '+' -f 1)" >> $GITHUB_OUTPUT
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: gemini-voice-app
           path: build/app/outputs/flutter-apk/app-release.apk
+
+      - name: Create Release
+        if: github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ steps.version.outputs.VERSION }}
+          name: Release ${{ steps.version.outputs.VERSION }}
+          body: |
+            ## 更新内容
+            - 添加文字输入功能
+            - 改进语音识别错误提示
+            - 添加自动更新检查功能
+            - 修复设置按钮清空配置的问题
+          files: build/app/outputs/flutter-apk/app-release.apk
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

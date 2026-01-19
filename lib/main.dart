@@ -3,6 +3,8 @@ import 'package:speech_to_text/speech_to_text.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'dart:convert';
 
 void main() => runApp(MyApp());
@@ -340,12 +342,106 @@ class _VoiceChatPageState extends State<VoiceChatPage> {
     );
   }
 
+  Future<void> _checkUpdate() async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Center(child: CircularProgressIndicator()),
+    );
+
+    try {
+      final packageInfo = await PackageInfo.fromPlatform();
+      final currentVersion = packageInfo.version;
+
+      // 检查 GitHub Releases
+      final response = await http.get(
+        Uri.parse('https://api.github.com/repos/1184030957-cmd/gemini-voice-app/releases/latest'),
+      );
+
+      Navigator.pop(context); // 关闭加载对话框
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final latestVersion = (data['tag_name'] as String).replaceAll('v', '');
+        final downloadUrl = data['assets'][0]['browser_download_url'] as String;
+        final releaseNotes = data['body'] as String;
+
+        if (_compareVersions(latestVersion, currentVersion) > 0) {
+          // 有新版本
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text('发现新版本 $latestVersion'),
+              content: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text('当前版本: $currentVersion'),
+                    SizedBox(height: 8),
+                    Text('更新内容:', style: TextStyle(fontWeight: FontWeight.bold)),
+                    SizedBox(height: 4),
+                    Text(releaseNotes),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text('取消'),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    Navigator.pop(context);
+                    // 使用镜像加速下载
+                    final mirrorUrl = 'https://ghproxy.com/$downloadUrl';
+                    final uri = Uri.parse(mirrorUrl);
+                    if (await canLaunchUrl(uri)) {
+                      await launchUrl(uri, mode: LaunchMode.externalApplication);
+                    }
+                  },
+                  child: Text('立即更新'),
+                ),
+              ],
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('已是最新版本 $currentVersion')),
+          );
+        }
+      } else {
+        throw Exception('无法获取版本信息');
+      }
+    } catch (e) {
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('检查更新失败: $e')),
+      );
+    }
+  }
+
+  int _compareVersions(String v1, String v2) {
+    final parts1 = v1.split('.').map(int.parse).toList();
+    final parts2 = v2.split('.').map(int.parse).toList();
+    for (int i = 0; i < 3; i++) {
+      if (parts1[i] > parts2[i]) return 1;
+      if (parts1[i] < parts2[i]) return -1;
+    }
+    return 0;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Gemini 语音对话'),
         actions: [
+          IconButton(
+            icon: Icon(Icons.system_update),
+            onPressed: _checkUpdate,
+            tooltip: '检查更新',
+          ),
           IconButton(
             icon: Icon(Icons.settings),
             onPressed: _editConfig,
