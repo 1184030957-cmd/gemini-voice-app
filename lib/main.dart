@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:speech_to_text/speech_to_text.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'dart:convert';
+import 'dart:io';
 
 void main() => runApp(MyApp());
 
@@ -146,19 +151,88 @@ class ChatPage extends StatefulWidget {
   _ChatPageState createState() => _ChatPageState();
 }
 
-class _ChatPageState extends State<ChatPage> {
+class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
+  final SpeechToText _speech = SpeechToText();
   final FlutterTts _tts = FlutterTts();
   final TextEditingController _textController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
   List<Map<String, String>> _messages = [];
   bool _isProcessing = false;
+  bool _isListening = false;
+  bool _speechAvailable = false;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _initSpeech();
     _tts.setLanguage("zh-CN");
     _tts.setSpeechRate(0.5);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // 当 App 从后台回到前台时，确保状态正常
+    if (state == AppLifecycleState.resumed) {
+      setState(() {});
+    }
+  }
+
+  Future<void> _initSpeech() async {
+    try {
+      final status = await Permission.microphone.request();
+      if (!status.isGranted) {
+        setState(() => _speechAvailable = false);
+        return;
+      }
+
+      bool available = await _speech.initialize(
+        onError: (error) => print("语音错误: ${error.errorMsg}"),
+        onStatus: (status) {
+          if (status == "notListening" && _isListening) {
+            setState(() => _isListening = false);
+          }
+        },
+      );
+
+      setState(() => _speechAvailable = available);
+    } catch (e) {
+      setState(() => _speechAvailable = false);
+    }
+  }
+
+  void _startListening() async {
+    if (!_speechAvailable || _isListening || _isProcessing) return;
+
+    bool available = await _speech.initialize();
+    if (available) {
+      setState(() => _isListening = true);
+      _speech.listen(
+        onResult: (result) {
+          if (result.finalResult && result.recognizedWords.isNotEmpty) {
+            _sendMessage(result.recognizedWords);
+            setState(() => _isListening = false);
+          }
+        },
+        listenFor: Duration(seconds: 30),
+        pauseFor: Duration(seconds: 3),
+        localeId: "zh_CN",
+      );
+    }
+  }
+
+  void _stopListening() {
+    if (_isListening) {
+      _speech.stop();
+      setState(() => _isListening = false);
+    }
   }
 
   Future<void> _sendMessage(String text) async {
@@ -219,6 +293,104 @@ class _ChatPageState extends State<ChatPage> {
     });
   }
 
+  Future<void> _checkUpdate() async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Center(child: CircularProgressIndicator()),
+    );
+
+    try {
+      final packageInfo = await PackageInfo.fromPlatform();
+      final currentVersion = packageInfo.version;
+
+      final response = await http.get(
+        Uri.parse('https://api.github.com/repos/1184030957-cmd/gemini-voice-app/releases/latest'),
+      );
+
+      Navigator.pop(context);
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final latestVersion = (data['tag_name'] as String).replaceAll('v', '');
+        final downloadUrl = data['assets'][0]['browser_download_url'] as String;
+
+        if (_compareVersions(latestVersion, currentVersion) > 0) {
+          _showUpdateDialog(latestVersion, currentVersion, downloadUrl, data['body'] as String);
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('已是最新版本 $currentVersion')),
+          );
+        }
+      }
+    } catch (e) {
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('检查更新失败，请访问 GitHub Releases 手动下载')),
+      );
+    }
+  }
+
+  void _showUpdateDialog(String latestVersion, String currentVersion, String downloadUrl, String releaseNotes) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('发现新版本 $latestVersion'),
+        content: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('当前版本: $currentVersion'),
+              SizedBox(height: 8),
+              Text('更新内容:', style: TextStyle(fontWeight: FontWeight.bold)),
+              SizedBox(height: 4),
+              Text(releaseNotes),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('取消'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _downloadUpdate(downloadUrl);
+            },
+            child: Text('立即更新'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _downloadUpdate(String downloadUrl) async {
+    final mirrorUrl = 'https://ghproxy.com/$downloadUrl';
+    final uri = Uri.parse(mirrorUrl);
+
+    try {
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('打开下载失败，请访问 GitHub Releases 手动下载')),
+      );
+    }
+  }
+
+  int _compareVersions(String v1, String v2) {
+    final parts1 = v1.split('.').map(int.parse).toList();
+    final parts2 = v2.split('.').map(int.parse).toList();
+    for (int i = 0; i < 3; i++) {
+      if (parts1[i] > parts2[i]) return 1;
+      if (parts1[i] < parts2[i]) return -1;
+    }
+    return 0;
+  }
+
   Future<void> _editConfig() async {
     final prefs = await SharedPreferences.getInstance();
     Navigator.pushReplacement(
@@ -239,6 +411,11 @@ class _ChatPageState extends State<ChatPage> {
       appBar: AppBar(
         title: Text('Gemini 对话'),
         actions: [
+          IconButton(
+            icon: Icon(Icons.system_update),
+            onPressed: _checkUpdate,
+            tooltip: '检查更新',
+          ),
           IconButton(
             icon: Icon(Icons.settings),
             onPressed: _editConfig,
@@ -278,38 +455,63 @@ class _ChatPageState extends State<ChatPage> {
               color: Colors.white,
               boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)],
             ),
-            child: Row(
+            child: Column(
               children: [
-                Expanded(
-                  child: TextField(
-                    controller: _textController,
-                    decoration: InputDecoration(
-                      hintText: '输入消息...',
-                      border: OutlineInputBorder(),
-                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    ),
-                    onSubmitted: (text) {
-                      if (text.isNotEmpty) {
-                        _sendMessage(text);
-                        _textController.clear();
-                      }
-                    },
-                    enabled: !_isProcessing,
-                  ),
-                ),
-                SizedBox(width: 8),
-                IconButton(
-                  icon: _isProcessing ? CircularProgressIndicator() : Icon(Icons.send),
-                  onPressed: _isProcessing
-                      ? null
-                      : () {
-                          if (_textController.text.isNotEmpty) {
-                            _sendMessage(_textController.text);
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _textController,
+                        decoration: InputDecoration(
+                          hintText: '输入消息...',
+                          border: OutlineInputBorder(),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        ),
+                        onSubmitted: (text) {
+                          if (text.isNotEmpty) {
+                            _sendMessage(text);
                             _textController.clear();
                           }
                         },
-                  color: Colors.blue,
+                        enabled: !_isProcessing,
+                      ),
+                    ),
+                    SizedBox(width: 8),
+                    IconButton(
+                      icon: _isProcessing ? SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)) : Icon(Icons.send),
+                      onPressed: _isProcessing
+                          ? null
+                          : () {
+                              if (_textController.text.isNotEmpty) {
+                                _sendMessage(_textController.text);
+                                _textController.clear();
+                              }
+                            },
+                      color: Colors.blue,
+                    ),
+                  ],
                 ),
+                if (_speechAvailable) ...[
+                  SizedBox(height: 12),
+                  GestureDetector(
+                    onTapDown: (_) => _startListening(),
+                    onTapUp: (_) => _stopListening(),
+                    child: Container(
+                      width: 60,
+                      height: 60,
+                      decoration: BoxDecoration(
+                        color: _isListening ? Colors.red : Colors.blue,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(Icons.mic, color: Colors.white, size: 30),
+                    ),
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    _isListening ? '正在听...' : '按住说话',
+                    style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                  ),
+                ],
               ],
             ),
           ),

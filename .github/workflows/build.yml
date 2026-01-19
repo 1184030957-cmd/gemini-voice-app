@@ -46,21 +46,21 @@ jobs:
           tag_name: v${{ steps.version.outputs.VERSION }}
           name: Release ${{ steps.version.outputs.VERSION }}
           body: |
-            ## v1.1.0 - 简化版本
+            ## v1.1.0 - 完整功能版本
 
-            **重写了整个应用，只保留核心功能：**
+            **所有功能都已修复并正常工作：**
             - ✅ 文字输入对话
-            - ✅ 语音播放回复
+            - ✅ 语音播放回复（TTS）
+            - ✅ 麦克风语音输入（修复权限问题）
+            - ✅ 自动更新检查（修复黑屏问题）
             - ✅ 配置保存和修改
             - ✅ 自动滚动到最新消息
-            - ✅ 发送时显示加载状态
 
-            **删除了有问题的功能：**
-            - ❌ 删除麦克风语音输入（不稳定）
-            - ❌ 删除自动更新检查（导致黑屏）
-
-            **手动更新方式：**
-            访问 GitHub Releases 下载新版本安装即可
+            **修复内容：**
+            - 使用 WidgetsBindingObserver 监听 App 生命周期，避免黑屏
+            - 正确请求麦克风权限
+            - 改进语音识别状态管理
+            - 优化更新下载流程
           files: build/app/outputs/flutter-apk/app-release.apk
           draft: false
           prerelease: false
