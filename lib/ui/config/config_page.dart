@@ -26,8 +26,8 @@ class _ConfigPageState extends State<ConfigPage> {
   }
 
   Future<void> _loadConfig() async {
-    final provider = context.read<ChatProvider>();
-    final config = await provider.loadConfig();
+    await context.read<ChatProvider>().loadConfig();
+    final config = context.read<ChatProvider>().getConfig();
 
     if (config != null) {
       _apiUrlController.text = config.apiUrl;
@@ -38,7 +38,9 @@ class _ConfigPageState extends State<ConfigPage> {
       _modelController.text = 'gpt-3.5-turbo';
     }
 
-    setState(() => _isLoading = false);
+    if (mounted) {
+      setState(() => _isLoading = false);
+    }
   }
 
   Future<void> _testConnection() async {

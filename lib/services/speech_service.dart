@@ -66,8 +66,8 @@ class SpeechService {
           _lastWords = result.recognizedWords;
           _stopListening();
           onResult?.call(_lastWords);
-        } else if (result.partialResult.isNotEmpty) {
-          onPartialResult?.call(result.partialResult);
+        } else if (onPartialResult != null) {
+          onPartialResult.call(result.recognizedWords);
         }
       },
       listenFor: Duration(seconds: 60),

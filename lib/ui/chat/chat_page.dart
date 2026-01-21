@@ -7,7 +7,7 @@ import '../../utils/validators.dart';
 import '../components/message_widget.dart';
 import '../components/input_widget.dart';
 import '../components/state_indicator.dart';
-import 'config_page.dart';
+import '../config/config_page.dart';
 
 class ChatPage extends StatefulWidget {
   const ChatPage({super.key});
