@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import '../models/message.dart';
 import '../models/config.dart';
 import '../services/api_service.dart';
-import '../services/speechService.dart';
-import '../services/ttsService.dart';
+import '../services/speech_service.dart';
+import '../services/tts_service.dart';
 import '../services/storage_service.dart';
 
 class ChatProvider with ChangeNotifier {
