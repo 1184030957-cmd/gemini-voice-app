@@ -33,6 +33,11 @@ jobs:
         id: version
         run: echo "VERSION=$(grep 'version:' pubspec.yaml | cut -d ' ' -f 2 | cut -d '+' -f 1)" >> $GITHUB_OUTPUT
 
+      - name: Get changelog
+        id: changelog
+        run: |
+          echo "CHANGELOG=$(git log --oneline -10 | sed 's/^/- /')" >> $GITHUB_OUTPUT
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
@@ -44,23 +49,19 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: v${{ steps.version.outputs.VERSION }}
-          name: Release ${{ steps.version.outputs.VERSION }}
+          name: Release v${{ steps.version.outputs.VERSION }}
           body: |
-            ## v1.1.0 - 完整功能版本
+            ## 更新内容
 
-            **所有功能都已修复并正常工作：**
-            - ✅ 文字输入对话
-            - ✅ 语音播放回复（TTS）
-            - ✅ 麦克风语音输入（修复权限问题）
-            - ✅ 自动更新检查（修复黑屏问题）
-            - ✅ 配置保存和修改
-            - ✅ 自动滚动到最新消息
+            ${{ steps.changelog.outputs.CHANGELOG }}
 
-            **修复内容：**
-            - 使用 WidgetsBindingObserver 监听 App 生命周期，避免黑屏
-            - 正确请求麦克风权限
-            - 改进语音识别状态管理
-            - 优化更新下载流程
+            ### 主要改进
+            - 重构代码架构，模块化设计
+            - 实现"像打电话一样"的持续对话模式
+            - API Key 加密存储
+            - 聊天消息持久化
+            - 深色模式支持
+            - 状态指示器优化
           files: build/app/outputs/flutter-apk/app-release.apk
           draft: false
           prerelease: false
