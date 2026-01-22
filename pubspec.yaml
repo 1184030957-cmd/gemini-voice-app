@@ -21,7 +21,6 @@ dependencies:
   uuid: ^4.0.0
   dio: ^5.4.0
   path_provider: ^2.1.1
-  android_intent_plus: ^4.0.3
 
 flutter:
   uses-material-design: true

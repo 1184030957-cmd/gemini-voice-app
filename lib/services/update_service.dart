@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
-import 'package:android_intent_plus/android_intent.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class UpdateService {
@@ -103,24 +102,11 @@ class UpdateService {
         throw Exception('APK文件为空');
       }
 
-      if (Platform.isAndroid) {
-        final intent = AndroidIntent(
-          action: 'android.intent.action.VIEW',
-          data: Uri.parse('file://$filePath'),
-          type: 'application/vnd.android.package-archive',
-          flags: <int>[
-            Flag.FLAG_ACTIVITY_NEW_TASK,
-            Flag.FLAG_GRANT_READ_URI_PERMISSION,
-          ],
-        );
-        await intent.launch();
+      final uri = Uri.file(filePath);
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
       } else {
-        final uri = Uri.file(filePath);
-        if (await canLaunchUrl(uri)) {
-          await launchUrl(uri);
-        } else {
-          throw Exception('无法打开APK文件');
-        }
+        throw Exception('无法打开APK文件。请前往文件管理器找到该文件并手动安装。\n路径: $filePath');
       }
     } catch (e) {
       throw Exception('安装失败: $e');
