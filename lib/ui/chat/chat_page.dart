@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import '../../providers/chat_provider.dart';
 import '../../models/message.dart';
 import '../../services/update_service.dart';
@@ -67,10 +68,81 @@ class _ChatPageState extends State<ChatPage> {
               Navigator.pop(context);
               final downloadUrl = releaseInfo['downloadUrl'] as String?;
               if (downloadUrl != null) {
-                _updateService.downloadUpdate(downloadUrl);
+                _startDownload(downloadUrl);
               }
             },
             child: const Text('立即更新'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _startDownload(String downloadUrl) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => _DownloadProgressDialog(),
+    );
+
+    _updateService.downloadUpdate(
+      downloadUrl: downloadUrl,
+      onProgress: (received, total) {
+        if (mounted) {
+          final progress = (received / total * 100).toIntAsFixed(0);
+          Navigator.of(context).pop();
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) => _DownloadProgressDialog(
+              progress: progress.toDouble(),
+              received: received,
+              total: total,
+            ),
+          );
+        }
+      },
+      onComplete: (filePath) {
+        if (mounted) {
+          Navigator.of(context).pop();
+          _showInstallDialog(filePath);
+        }
+      },
+      onError: (error) {
+        if (mounted) {
+          Navigator.of(context).pop();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('下载失败: $error')),
+          );
+        }
+      },
+    );
+  }
+
+  void _showInstallDialog(String filePath) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('下载完成'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.check_circle, color: Colors.green, size: 64),
+            const SizedBox(height: 16),
+            const Text('APK 已下载完成，是否立即安装？'),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('稍后'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _updateService.installApk(filePath);
+            },
+            child: const Text('立即安装'),
           ),
         ],
       ),
@@ -84,12 +156,36 @@ class _ChatPageState extends State<ChatPage> {
       builder: (context) => const Center(child: CircularProgressIndicator()),
     );
 
-    final releaseInfo = await _updateService.getLatestReleaseInfo();
-    Navigator.pop(context);
+    try {
+      final packageInfo = await PackageInfo.fromPlatform();
+      final currentVersion = packageInfo.version;
+      final releaseInfo = await _updateService.getLatestReleaseInfo();
 
-    if (releaseInfo != null) {
-      _showUpdateDialog(releaseInfo);
-    } else {
+      Navigator.pop(context);
+
+      if (releaseInfo == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('检查更新失败')),
+        );
+        return;
+      }
+
+      final latestVersion = releaseInfo['version'] as String;
+      final comparison = _updateService.compareVersions(latestVersion, currentVersion);
+
+      if (comparison > 0) {
+        _showUpdateDialog(releaseInfo);
+      } else if (comparison == 0) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('当前已是最新版本 v$currentVersion')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('检查更新失败')),
+        );
+      }
+    } catch (e) {
+      Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('检查更新失败')),
       );
@@ -207,5 +303,55 @@ class _ChatPageState extends State<ChatPage> {
         ],
       ),
     );
+  }
+}
+
+class _DownloadProgressDialog extends StatefulWidget {
+  final double? progress;
+  final int? received;
+  final int? total;
+
+  const _DownloadProgressDialog({this.progress, this.received, this.total});
+
+  @override
+  State<_DownloadProgressDialog> createState() => _DownloadProgressDialogState();
+}
+
+class _DownloadProgressDialogState extends State<_DownloadProgressDialog> {
+  @override
+  Widget build(BuildContext context) {
+    final progress = widget.progress ?? 0;
+    final received = widget.received ?? 0;
+    final total = widget.total ?? 0;
+
+    String receivedText = _formatBytes(received);
+    String totalText = _formatBytes(total);
+
+    return AlertDialog(
+      title: const Text('正在下载更新'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          LinearProgressIndicator(
+            value: progress / 100,
+            minHeight: 8,
+            backgroundColor: Colors.grey[200],
+            valueColor: const AlwaysStoppedAnimation<Color>(Colors.blue),
+          ),
+          const SizedBox(height: 16),
+          Text('$progress%'),
+          const SizedBox(height: 8),
+          Text('$receivedText / $totalText'),
+          const SizedBox(height: 8),
+          const Text('请稍候...', style: TextStyle(color: Colors.grey)),
+        ],
+      ),
+    );
+  }
+
+  String _formatBytes(int bytes) {
+    if (bytes < 1024) return '$bytes B';
+    if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} KB';
+    return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
   }
 }

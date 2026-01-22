@@ -44,8 +44,7 @@ class ApiService {
         },
         body: jsonEncode({
           "model": model,
-          "messages": [{"role": "user", "content": "test"}],
-          "max_tokens": 1,
+          "messages": [{"role": "user", "content": "hi"}],
         }),
       );
       return response.statusCode == 200;

@@ -30,6 +30,29 @@ class ChatProvider with ChangeNotifier {
     _speechService.initialize();
     _ttsService.setSpeechRate(0.5);
 
+    _speechService.onStateChanged = (state) {
+      switch (state) {
+        case SpeechState.available:
+          _updateState(ChatState.idle);
+          break;
+        case SpeechState.listening:
+          _updateState(ChatState.listening);
+          break;
+        case SpeechState.recognizing:
+          _updateState(ChatState.recognizing);
+          break;
+        case SpeechState.permissionDenied:
+        case SpeechState.notAvailable:
+        case SpeechState.error:
+          _setError(_speechService.errorMessage);
+          _updateState(ChatState.error);
+          break;
+        case SpeechState.initializing:
+        case SpeechState.stopped:
+          break;
+      }
+    };
+
     _speechService.onResult = (text) {
       if (text.isNotEmpty) {
         _sendMessage(text);
@@ -100,8 +123,15 @@ class ChatProvider with ChangeNotifier {
       _ttsService.stop();
     }
     _clearError();
-    _speechService.startListening();
-    _updateState(ChatState.listening);
+    final success = _speechService.startListening();
+    if (success) {
+      _updateState(ChatState.listening);
+    } else {
+      final error = _speechService.errorMessage;
+      if (error.isNotEmpty) {
+        _setError(error);
+      }
+    }
   }
 
   void stopListening() {
