@@ -82,10 +82,8 @@ class _ChatPageState extends State<ChatPage> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => DownloadProgressDialog(
-        onProgress: (received, total) {},
-      ),
-    ).then((_) {});
+      builder: (context) => const DownloadProgressDialog(),
+    );
 
     _updateService.downloadUpdate(
       downloadUrl: downloadUrl,
@@ -107,7 +105,13 @@ class _ChatPageState extends State<ChatPage> {
       onComplete: (filePath) {
         if (mounted) {
           Navigator.of(context).pop();
-          _showInstallDialog(filePath);
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => InstallReadyDialog(filePath: filePath),
+            ),
+          );
+        }
+      },
         }
       },
       onError: (error) {
@@ -118,55 +122,6 @@ class _ChatPageState extends State<ChatPage> {
           );
         }
       },
-    );
-  }
-
-  void _showInstallDialog(String filePath) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('下载完成'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.check_circle, color: Colors.green, size: 64),
-            const SizedBox(height: 16),
-            const Text('APK 已下载完成'),
-            const SizedBox(height: 8),
-            Text(
-              '安装包位置:',
-              style: TextStyle(fontSize: 12, color: Colors.grey),
-            ),
-            Text(
-              filePath,
-              style: TextStyle(fontSize: 10, color: Colors.grey),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
-            const Text(
-              '点击"立即安装"开始更新',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('稍后'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _updateService.installApk(filePath).catchError((e) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('安装失败: $e')),
-                );
-              });
-            },
-            child: const Text('立即安装'),
-          ),
-        ],
-      ),
     );
   }
 
@@ -331,12 +286,14 @@ class DownloadProgressDialog extends StatefulWidget {
   final int initialProgress;
   final int received;
   final int total;
+  final String filePath;
 
   const DownloadProgressDialog({
     super.key,
     this.initialProgress = 0,
     this.received = 0,
     this.total = 0,
+    this.filePath = '',
   });
 
   @override
@@ -413,8 +370,11 @@ class _DownloadProgressDialogState extends State<DownloadProgressDialog> {
             ElevatedButton(
               onPressed: () {
                 Navigator.of(context).pop();
-                final downloadDir = '/storage/emulated/0/Android/data/com.example.gemini_voice_app/files';
-                _showInstallDialog(downloadDir);
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => InstallReadyDialog(filePath: widget.filePath),
+                  ),
+                );
               },
               child: const Text('安装'),
             )
@@ -429,5 +389,58 @@ class _DownloadProgressDialogState extends State<DownloadProgressDialog> {
     if (bytes < 1024) return '$bytes B';
     if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} KB';
     return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+  }
+}
+
+class InstallReadyDialog extends StatelessWidget {
+  final String filePath;
+
+  const InstallReadyDialog({super.key, required this.filePath});
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('下载完成'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.check_circle, color: Colors.green, size: 64),
+          const SizedBox(height: 16),
+          const Text('APK 已下载完成'),
+          const SizedBox(height: 8),
+          Text(
+            '安装包位置:',
+            style: TextStyle(fontSize: 12, color: Colors.grey),
+          ),
+          Text(
+            filePath,
+            style: TextStyle(fontSize: 10, color: Colors.grey),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 16),
+          const Text(
+            '点击"立即安装"开始更新',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('稍后'),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            Navigator.pop(context);
+            context.read<UpdateService>().installApk(filePath).catchError((e) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('安装失败: $e')),
+              );
+            });
+          },
+          child: const Text('立即安装'),
+        ),
+      ],
+    );
   }
 }

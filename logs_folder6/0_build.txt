@@ -1,0 +1,527 @@
+﻿2026-01-22T02:22:25.4305166Z Current runner version: '2.331.0'
+2026-01-22T02:22:25.4333609Z ##[group]Runner Image Provisioner
+2026-01-22T02:22:25.4335110Z Hosted Compute Agent
+2026-01-22T02:22:25.4335640Z Version: 20251211.462
+2026-01-22T02:22:25.4336221Z Commit: 6cbad8c2bb55d58165063d031ccabf57e2d2db61
+2026-01-22T02:22:25.4337007Z Build Date: 2025-12-11T16:28:49Z
+2026-01-22T02:22:25.4337716Z Worker ID: {330663cb-2085-46d4-b5ec-6375550d2e53}
+2026-01-22T02:22:25.4338385Z ##[endgroup]
+2026-01-22T02:22:25.4339154Z ##[group]Operating System
+2026-01-22T02:22:25.4339746Z Ubuntu
+2026-01-22T02:22:25.4340180Z 24.04.3
+2026-01-22T02:22:25.4340700Z LTS
+2026-01-22T02:22:25.4341120Z ##[endgroup]
+2026-01-22T02:22:25.4341633Z ##[group]Runner Image
+2026-01-22T02:22:25.4342156Z Image: ubuntu-24.04
+2026-01-22T02:22:25.4342680Z Version: 20260111.209.1
+2026-01-22T02:22:25.4343647Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260111.209/images/ubuntu/Ubuntu2404-Readme.md
+2026-01-22T02:22:25.4345266Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260111.209
+2026-01-22T02:22:25.4346252Z ##[endgroup]
+2026-01-22T02:22:25.4349119Z ##[group]GITHUB_TOKEN Permissions
+2026-01-22T02:22:25.4351817Z Actions: write
+2026-01-22T02:22:25.4352466Z ArtifactMetadata: write
+2026-01-22T02:22:25.4353012Z Attestations: write
+2026-01-22T02:22:25.4353526Z Checks: write
+2026-01-22T02:22:25.4353958Z Contents: write
+2026-01-22T02:22:25.4354550Z Deployments: write
+2026-01-22T02:22:25.4355125Z Discussions: write
+2026-01-22T02:22:25.4355569Z Issues: write
+2026-01-22T02:22:25.4356117Z Metadata: read
+2026-01-22T02:22:25.4356589Z Models: read
+2026-01-22T02:22:25.4357046Z Packages: write
+2026-01-22T02:22:25.4357568Z Pages: write
+2026-01-22T02:22:25.4358093Z PullRequests: write
+2026-01-22T02:22:25.4358738Z RepositoryProjects: write
+2026-01-22T02:22:25.4359728Z SecurityEvents: write
+2026-01-22T02:22:25.4360278Z Statuses: write
+2026-01-22T02:22:25.4360743Z ##[endgroup]
+2026-01-22T02:22:25.4363633Z Secret source: Actions
+2026-01-22T02:22:25.4364378Z Prepare workflow directory
+2026-01-22T02:22:25.4742509Z Prepare all required actions
+2026-01-22T02:22:25.4802361Z Getting action download info
+2026-01-22T02:22:25.8700425Z Download action repository 'actions/checkout@v3' (SHA:f43a0e5ff2bd294095638e18286ca9a3d1956744)
+2026-01-22T02:22:25.9743195Z Download action repository 'actions/setup-java@v3' (SHA:17f84c3641ba7b8f6deff6309fc4c864478f5d62)
+2026-01-22T02:22:26.4728289Z Download action repository 'subosito/flutter-action@v2' (SHA:fd55f4c5af5b953cc57a2be44cb082c8f6635e8e)
+2026-01-22T02:22:26.7368424Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+2026-01-22T02:22:26.8536336Z Download action repository 'softprops/action-gh-release@v1' (SHA:de2c0eb89ae2a093876385947365aca7b0e5f844)
+2026-01-22T02:22:27.3065887Z Getting action download info
+2026-01-22T02:22:27.4197486Z Download action repository 'actions/cache@v4' (SHA:0057852bfaa89a56745cba8c7296529d2fc39830)
+2026-01-22T02:22:27.5983876Z Complete job name: build
+2026-01-22T02:22:27.6832359Z ##[group]Run actions/checkout@v3
+2026-01-22T02:22:27.6833612Z with:
+2026-01-22T02:22:27.6834413Z   repository: 1184030957-cmd/gemini-voice-app
+2026-01-22T02:22:27.6835746Z   token: ***
+2026-01-22T02:22:27.6836460Z   ssh-strict: true
+2026-01-22T02:22:27.6837252Z   persist-credentials: true
+2026-01-22T02:22:27.6838094Z   clean: true
+2026-01-22T02:22:27.6838871Z   sparse-checkout-cone-mode: true
+2026-01-22T02:22:27.6839951Z   fetch-depth: 1
+2026-01-22T02:22:27.6840691Z   fetch-tags: false
+2026-01-22T02:22:27.6841413Z   lfs: false
+2026-01-22T02:22:27.6842109Z   submodules: false
+2026-01-22T02:22:27.6842873Z   set-safe-directory: true
+2026-01-22T02:22:27.6844059Z ##[endgroup]
+2026-01-22T02:22:27.7734304Z Syncing repository: 1184030957-cmd/gemini-voice-app
+2026-01-22T02:22:27.7737172Z ##[group]Getting Git version info
+2026-01-22T02:22:27.7738739Z Working directory is '/home/runner/work/gemini-voice-app/gemini-voice-app'
+2026-01-22T02:22:27.7740844Z [command]/usr/bin/git version
+2026-01-22T02:22:27.7797804Z git version 2.52.0
+2026-01-22T02:22:27.7826706Z ##[endgroup]
+2026-01-22T02:22:27.7843558Z Temporarily overriding HOME='/home/runner/work/_temp/ac8ee34e-ea5d-4ec6-81c4-03cffa6afddf' before making global git config changes
+2026-01-22T02:22:27.7846334Z Adding repository directory to the temporary git global config as a safe directory
+2026-01-22T02:22:27.7848809Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/gemini-voice-app/gemini-voice-app
+2026-01-22T02:22:27.7889341Z Deleting the contents of '/home/runner/work/gemini-voice-app/gemini-voice-app'
+2026-01-22T02:22:27.7893499Z ##[group]Initializing the repository
+2026-01-22T02:22:27.7896835Z [command]/usr/bin/git init /home/runner/work/gemini-voice-app/gemini-voice-app
+2026-01-22T02:22:27.8002052Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-01-22T02:22:27.8004975Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-01-22T02:22:27.8008201Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-01-22T02:22:27.8010754Z hint: call:
+2026-01-22T02:22:27.8011923Z hint:
+2026-01-22T02:22:27.8013404Z hint: 	git config --global init.defaultBranch <name>
+2026-01-22T02:22:27.8015156Z hint:
+2026-01-22T02:22:27.8016820Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-01-22T02:22:27.8019988Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-01-22T02:22:27.8022180Z hint:
+2026-01-22T02:22:27.8023275Z hint: 	git branch -m <name>
+2026-01-22T02:22:27.8024447Z hint:
+2026-01-22T02:22:27.8025565Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-01-22T02:22:27.8027535Z Initialized empty Git repository in /home/runner/work/gemini-voice-app/gemini-voice-app/.git/
+2026-01-22T02:22:27.8032948Z [command]/usr/bin/git remote add origin https://github.com/1184030957-cmd/gemini-voice-app
+2026-01-22T02:22:27.8126445Z ##[endgroup]
+2026-01-22T02:22:27.8127921Z ##[group]Disabling automatic garbage collection
+2026-01-22T02:22:27.8129529Z [command]/usr/bin/git config --local gc.auto 0
+2026-01-22T02:22:27.8133897Z ##[endgroup]
+2026-01-22T02:22:27.8135986Z ##[group]Setting up auth
+2026-01-22T02:22:27.8138126Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-01-22T02:22:27.8144877Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-01-22T02:22:27.8488437Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-01-22T02:22:27.8521128Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-01-22T02:22:27.8751562Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-01-22T02:22:27.8785620Z ##[endgroup]
+2026-01-22T02:22:27.8787948Z ##[group]Fetching the repository
+2026-01-22T02:22:27.8797119Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --progress --no-recurse-submodules --depth=1 origin +3cda554da453f689f9888c5bfc212538055df9a1:refs/remotes/origin/main
+2026-01-22T02:22:28.0707569Z remote: Enumerating objects: 62, done.        
+2026-01-22T02:22:28.0709578Z remote: Counting objects:   1% (1/62)        
+2026-01-22T02:22:28.0711406Z remote: Counting objects:   3% (2/62)        
+2026-01-22T02:22:28.0712722Z remote: Counting objects:   4% (3/62)        
+2026-01-22T02:22:28.0713794Z remote: Counting objects:   6% (4/62)        
+2026-01-22T02:22:28.0715011Z remote: Counting objects:   8% (5/62)        
+2026-01-22T02:22:28.0716061Z remote: Counting objects:   9% (6/62)        
+2026-01-22T02:22:28.0717336Z remote: Counting objects:  11% (7/62)        
+2026-01-22T02:22:28.0718708Z remote: Counting objects:  12% (8/62)        
+2026-01-22T02:22:28.0720529Z remote: Counting objects:  14% (9/62)        
+2026-01-22T02:22:28.0721584Z remote: Counting objects:  16% (10/62)        
+2026-01-22T02:22:28.0722640Z remote: Counting objects:  17% (11/62)        
+2026-01-22T02:22:28.0723698Z remote: Counting objects:  19% (12/62)        
+2026-01-22T02:22:28.0724766Z remote: Counting objects:  20% (13/62)        
+2026-01-22T02:22:28.0725832Z remote: Counting objects:  22% (14/62)        
+2026-01-22T02:22:28.0726885Z remote: Counting objects:  24% (15/62)        
+2026-01-22T02:22:28.0727946Z remote: Counting objects:  25% (16/62)        
+2026-01-22T02:22:28.0729125Z remote: Counting objects:  27% (17/62)        
+2026-01-22T02:22:28.0730205Z remote: Counting objects:  29% (18/62)        
+2026-01-22T02:22:28.0731262Z remote: Counting objects:  30% (19/62)        
+2026-01-22T02:22:28.0732322Z remote: Counting objects:  32% (20/62)        
+2026-01-22T02:22:28.0733398Z remote: Counting objects:  33% (21/62)        
+2026-01-22T02:22:28.0734480Z remote: Counting objects:  35% (22/62)        
+2026-01-22T02:22:28.0735550Z remote: Counting objects:  37% (23/62)        
+2026-01-22T02:22:28.0736603Z remote: Counting objects:  38% (24/62)        
+2026-01-22T02:22:28.0737663Z remote: Counting objects:  40% (25/62)        
+2026-01-22T02:22:28.0738712Z remote: Counting objects:  41% (26/62)        
+2026-01-22T02:22:28.0739882Z remote: Counting objects:  43% (27/62)        
+2026-01-22T02:22:28.0740932Z remote: Counting objects:  45% (28/62)        
+2026-01-22T02:22:28.0742762Z remote: Counting objects:  46% (29/62)        
+2026-01-22T02:22:28.0744316Z remote: Counting objects:  48% (30/62)        
+2026-01-22T02:22:28.0746107Z remote: Counting objects:  50% (31/62)        
+2026-01-22T02:22:28.0747942Z remote: Counting objects:  51% (32/62)        
+2026-01-22T02:22:28.0749304Z remote: Counting objects:  53% (33/62)        
+2026-01-22T02:22:28.0750425Z remote: Counting objects:  54% (34/62)        
+2026-01-22T02:22:28.0751513Z remote: Counting objects:  56% (35/62)        
+2026-01-22T02:22:28.0752583Z remote: Counting objects:  58% (36/62)        
+2026-01-22T02:22:28.0753655Z remote: Counting objects:  59% (37/62)        
+2026-01-22T02:22:28.0754711Z remote: Counting objects:  61% (38/62)        
+2026-01-22T02:22:28.0755761Z remote: Counting objects:  62% (39/62)        
+2026-01-22T02:22:28.0756823Z remote: Counting objects:  64% (40/62)        
+2026-01-22T02:22:28.0757880Z remote: Counting objects:  66% (41/62)        
+2026-01-22T02:22:28.0759163Z remote: Counting objects:  67% (42/62)        
+2026-01-22T02:22:28.0760405Z remote: Counting objects:  69% (43/62)        
+2026-01-22T02:22:28.0761472Z remote: Counting objects:  70% (44/62)        
+2026-01-22T02:22:28.0762524Z remote: Counting objects:  72% (45/62)        
+2026-01-22T02:22:28.0763594Z remote: Counting objects:  74% (46/62)        
+2026-01-22T02:22:28.0764653Z remote: Counting objects:  75% (47/62)        
+2026-01-22T02:22:28.0765712Z remote: Counting objects:  77% (48/62)        
+2026-01-22T02:22:28.0767060Z remote: Counting objects:  79% (49/62)        
+2026-01-22T02:22:28.0768370Z remote: Counting objects:  80% (50/62)        
+2026-01-22T02:22:28.0769563Z remote: Counting objects:  82% (51/62)        
+2026-01-22T02:22:28.0770729Z remote: Counting objects:  83% (52/62)        
+2026-01-22T02:22:28.0771787Z remote: Counting objects:  85% (53/62)        
+2026-01-22T02:22:28.0772834Z remote: Counting objects:  87% (54/62)        
+2026-01-22T02:22:28.0773892Z remote: Counting objects:  88% (55/62)        
+2026-01-22T02:22:28.0774950Z remote: Counting objects:  90% (56/62)        
+2026-01-22T02:22:28.0776003Z remote: Counting objects:  91% (57/62)        
+2026-01-22T02:22:28.0777054Z remote: Counting objects:  93% (58/62)        
+2026-01-22T02:22:28.0778127Z remote: Counting objects:  95% (59/62)        
+2026-01-22T02:22:28.0779300Z remote: Counting objects:  96% (60/62)        
+2026-01-22T02:22:28.0780364Z remote: Counting objects:  98% (61/62)        
+2026-01-22T02:22:28.0781438Z remote: Counting objects: 100% (62/62)        
+2026-01-22T02:22:28.0782746Z remote: Counting objects: 100% (62/62), done.        
+2026-01-22T02:22:28.0783911Z remote: Compressing objects:   2% (1/45)        
+2026-01-22T02:22:28.0785039Z remote: Compressing objects:   4% (2/45)        
+2026-01-22T02:22:28.0786184Z remote: Compressing objects:   6% (3/45)        
+2026-01-22T02:22:28.0787289Z remote: Compressing objects:   8% (4/45)        
+2026-01-22T02:22:28.0788392Z remote: Compressing objects:  11% (5/45)        
+2026-01-22T02:22:28.0789599Z remote: Compressing objects:  13% (6/45)        
+2026-01-22T02:22:28.0790695Z remote: Compressing objects:  15% (7/45)        
+2026-01-22T02:22:28.0791801Z remote: Compressing objects:  17% (8/45)        
+2026-01-22T02:22:28.0792896Z remote: Compressing objects:  20% (9/45)        
+2026-01-22T02:22:28.0793982Z remote: Compressing objects:  22% (10/45)        
+2026-01-22T02:22:28.0795217Z remote: Compressing objects:  24% (11/45)        
+2026-01-22T02:22:28.0796339Z remote: Compressing objects:  26% (12/45)        
+2026-01-22T02:22:28.0797469Z remote: Compressing objects:  28% (13/45)        
+2026-01-22T02:22:28.0798583Z remote: Compressing objects:  31% (14/45)        
+2026-01-22T02:22:28.0800060Z remote: Compressing objects:  33% (15/45)        
+2026-01-22T02:22:28.0801197Z remote: Compressing objects:  35% (16/45)        
+2026-01-22T02:22:28.0802304Z remote: Compressing objects:  37% (17/45)        
+2026-01-22T02:22:28.0803407Z remote: Compressing objects:  40% (18/45)        
+2026-01-22T02:22:28.0804518Z remote: Compressing objects:  42% (19/45)        
+2026-01-22T02:22:28.0805621Z remote: Compressing objects:  44% (20/45)        
+2026-01-22T02:22:28.0806732Z remote: Compressing objects:  46% (21/45)        
+2026-01-22T02:22:28.0807836Z remote: Compressing objects:  48% (22/45)        
+2026-01-22T02:22:28.0809089Z remote: Compressing objects:  51% (23/45)        
+2026-01-22T02:22:28.0810208Z remote: Compressing objects:  53% (24/45)        
+2026-01-22T02:22:28.0811340Z remote: Compressing objects:  55% (25/45)        
+2026-01-22T02:22:28.0812461Z remote: Compressing objects:  57% (26/45)        
+2026-01-22T02:22:28.0813573Z remote: Compressing objects:  60% (27/45)        
+2026-01-22T02:22:28.0814679Z remote: Compressing objects:  62% (28/45)        
+2026-01-22T02:22:28.0815795Z remote: Compressing objects:  64% (29/45)        
+2026-01-22T02:22:28.0816905Z remote: Compressing objects:  66% (30/45)        
+2026-01-22T02:22:28.0818003Z remote: Compressing objects:  68% (31/45)        
+2026-01-22T02:22:28.0819222Z remote: Compressing objects:  71% (32/45)        
+2026-01-22T02:22:28.0820335Z remote: Compressing objects:  73% (33/45)        
+2026-01-22T02:22:28.0821438Z remote: Compressing objects:  75% (34/45)        
+2026-01-22T02:22:28.0822535Z remote: Compressing objects:  77% (35/45)        
+2026-01-22T02:22:28.0823640Z remote: Compressing objects:  80% (36/45)        
+2026-01-22T02:22:28.0824741Z remote: Compressing objects:  82% (37/45)        
+2026-01-22T02:22:28.0826073Z remote: Compressing objects:  84% (38/45)        
+2026-01-22T02:22:28.0827223Z remote: Compressing objects:  86% (39/45)        
+2026-01-22T02:22:28.0828338Z remote: Compressing objects:  88% (40/45)        
+2026-01-22T02:22:28.0829567Z remote: Compressing objects:  91% (41/45)        
+2026-01-22T02:22:28.0830705Z remote: Compressing objects:  93% (42/45)        
+2026-01-22T02:22:28.0831806Z remote: Compressing objects:  95% (43/45)        
+2026-01-22T02:22:28.0832920Z remote: Compressing objects:  97% (44/45)        
+2026-01-22T02:22:28.0834027Z remote: Compressing objects: 100% (45/45)        
+2026-01-22T02:22:28.0835209Z remote: Compressing objects: 100% (45/45), done.        
+2026-01-22T02:22:28.0902358Z remote: Total 62 (delta 1), reused 46 (delta 1), pack-reused 0 (from 0)        
+2026-01-22T02:22:28.1000896Z From https://github.com/1184030957-cmd/gemini-voice-app
+2026-01-22T02:22:28.1003632Z  * [new ref]         3cda554da453f689f9888c5bfc212538055df9a1 -> origin/main
+2026-01-22T02:22:28.1036071Z ##[endgroup]
+2026-01-22T02:22:28.1038275Z ##[group]Determining the checkout info
+2026-01-22T02:22:28.1041994Z ##[endgroup]
+2026-01-22T02:22:28.1043223Z ##[group]Checking out the ref
+2026-01-22T02:22:28.1044600Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+2026-01-22T02:22:28.1135116Z Switched to a new branch 'main'
+2026-01-22T02:22:28.1136725Z branch 'main' set up to track 'origin/main'.
+2026-01-22T02:22:28.1146526Z ##[endgroup]
+2026-01-22T02:22:28.1185988Z [command]/usr/bin/git log -1 --format='%H'
+2026-01-22T02:22:28.1211652Z '3cda554da453f689f9888c5bfc212538055df9a1'
+2026-01-22T02:22:28.1555864Z ##[group]Run actions/setup-java@v3
+2026-01-22T02:22:28.1556822Z with:
+2026-01-22T02:22:28.1557488Z   distribution: zulu
+2026-01-22T02:22:28.1558239Z   java-version: 17
+2026-01-22T02:22:28.1559114Z   java-package: jdk
+2026-01-22T02:22:28.1559871Z   check-latest: false
+2026-01-22T02:22:28.1560629Z   server-id: github
+2026-01-22T02:22:28.1561385Z   server-username: GITHUB_ACTOR
+2026-01-22T02:22:28.1562316Z   server-password: GITHUB_TOKEN
+2026-01-22T02:22:28.1563199Z   overwrite-settings: true
+2026-01-22T02:22:28.1564004Z   job-status: success
+2026-01-22T02:22:28.1565075Z   token: ***
+2026-01-22T02:22:28.1565757Z ##[endgroup]
+2026-01-22T02:22:28.3705002Z ##[group]Installed distributions
+2026-01-22T02:22:28.3748401Z Trying to resolve the latest version from remote
+2026-01-22T02:22:28.4726630Z Resolved latest version as 17.0.18+8
+2026-01-22T02:22:28.4728519Z Trying to download...
+2026-01-22T02:22:28.4731674Z Downloading Java 17.0.18+8 (Zulu) from https://cdn.azul.com/zulu/bin/zulu17.64.15-ca-jdk17.0.18-linux_x64.tar.gz ...
+2026-01-22T02:22:32.5056963Z Extracting Java archive...
+2026-01-22T02:22:32.5178312Z [command]/usr/bin/tar xz --warning=no-unknown-keyword -C /home/runner/work/_temp/0489dc01-840e-4758-b211-cd8fa162c042 -f /home/runner/work/_temp/f725b8a6-7cde-41c5-b1f4-6dcd0e7fbbe5
+2026-01-22T02:22:35.1500041Z Java 17.0.18+8 was downloaded
+2026-01-22T02:22:35.1500629Z Setting Java 17.0.18+8 as the default
+2026-01-22T02:22:35.1510540Z Creating toolchains.xml for JDK version 17 from zulu
+2026-01-22T02:22:35.1592799Z Writing to /home/runner/.m2/toolchains.xml
+2026-01-22T02:22:35.1593343Z 
+2026-01-22T02:22:35.1593675Z Java configuration:
+2026-01-22T02:22:35.1594065Z   Distribution: zulu
+2026-01-22T02:22:35.1594418Z   Version: 17.0.18+8
+2026-01-22T02:22:35.1594845Z   Path: /opt/hostedtoolcache/Java_Zulu_jdk/17.0.18-8/x64
+2026-01-22T02:22:35.1595284Z 
+2026-01-22T02:22:35.1596152Z ##[endgroup]
+2026-01-22T02:22:35.1615494Z Creating settings.xml with server-id: github
+2026-01-22T02:22:35.1615933Z Writing to /home/runner/.m2/settings.xml
+2026-01-22T02:22:35.1916291Z ##[group]Run subosito/flutter-action@v2
+2026-01-22T02:22:35.1916622Z with:
+2026-01-22T02:22:35.1916807Z   flutter-version: 3.13.9
+2026-01-22T02:22:35.1917030Z   channel: stable
+2026-01-22T02:22:35.1917239Z   architecture: X64
+2026-01-22T02:22:35.1917422Z   cache: false
+2026-01-22T02:22:35.1917617Z   pub-cache-path: default
+2026-01-22T02:22:35.1917821Z   dry-run: false
+2026-01-22T02:22:35.1918100Z   git-source: https://github.com/flutter/flutter.git
+2026-01-22T02:22:35.1918395Z env:
+2026-01-22T02:22:35.1918643Z   JAVA_HOME: /opt/hostedtoolcache/Java_Zulu_jdk/17.0.18-8/x64
+2026-01-22T02:22:35.1919257Z   JAVA_HOME_17_X64: /opt/hostedtoolcache/Java_Zulu_jdk/17.0.18-8/x64
+2026-01-22T02:22:35.1919595Z ##[endgroup]
+2026-01-22T02:22:35.3011923Z ##[group]Run chmod +x "$GITHUB_ACTION_PATH/setup.sh"
+2026-01-22T02:22:35.3012425Z [36;1mchmod +x "$GITHUB_ACTION_PATH/setup.sh"[0m
+2026-01-22T02:22:35.3051928Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-01-22T02:22:35.3052375Z env:
+2026-01-22T02:22:35.3052711Z   JAVA_HOME: /opt/hostedtoolcache/Java_Zulu_jdk/17.0.18-8/x64
+2026-01-22T02:22:35.3053126Z   JAVA_HOME_17_X64: /opt/hostedtoolcache/Java_Zulu_jdk/17.0.18-8/x64
+2026-01-22T02:22:35.3053450Z ##[endgroup]
+2026-01-22T02:22:35.3206561Z ##[group]Run $GITHUB_ACTION_PATH/setup.sh -p \
+2026-01-22T02:22:35.3206950Z [36;1m$GITHUB_ACTION_PATH/setup.sh -p \[0m
+2026-01-22T02:22:35.3207441Z [36;1m  -n '3.13.9' \[0m
+2026-01-22T02:22:35.3207656Z [36;1m  -f '' \[0m
+2026-01-22T02:22:35.3207853Z [36;1m  -a 'X64' \[0m
+2026-01-22T02:22:35.3208052Z [36;1m  -k '' \[0m
+2026-01-22T02:22:35.3208247Z [36;1m  -c '' \[0m
+2026-01-22T02:22:35.3208431Z [36;1m  -l '' \[0m
+2026-01-22T02:22:35.3208622Z [36;1m  -d 'default' \[0m
+2026-01-22T02:22:35.3209206Z [36;1m  -g 'https://github.com/flutter/flutter.git' \[0m
+2026-01-22T02:22:35.3209551Z [36;1m  stable[0m
+2026-01-22T02:22:35.3242170Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-01-22T02:22:35.3242503Z env:
+2026-01-22T02:22:35.3242784Z   JAVA_HOME: /opt/hostedtoolcache/Java_Zulu_jdk/17.0.18-8/x64
+2026-01-22T02:22:35.3243190Z   JAVA_HOME_17_X64: /opt/hostedtoolcache/Java_Zulu_jdk/17.0.18-8/x64
+2026-01-22T02:22:35.3243510Z ##[endgroup]
+2026-01-22T02:22:35.4973045Z ##[group]Run $GITHUB_ACTION_PATH/setup.sh \
+2026-01-22T02:22:35.4973398Z [36;1m$GITHUB_ACTION_PATH/setup.sh \[0m
+2026-01-22T02:22:35.4973688Z [36;1m  -n '3.13.9' \[0m
+2026-01-22T02:22:35.4973900Z [36;1m  -a 'x64' \[0m
+2026-01-22T02:22:35.4974187Z [36;1m  -c '/opt/hostedtoolcache/flutter/stable-3.13.9-x64' \[0m
+2026-01-22T02:22:35.4974556Z [36;1m  -d '/home/runner/.pub-cache' \[0m
+2026-01-22T02:22:35.4974820Z [36;1m  stable[0m
+2026-01-22T02:22:35.5008121Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-01-22T02:22:35.5008460Z env:
+2026-01-22T02:22:35.5008727Z   JAVA_HOME: /opt/hostedtoolcache/Java_Zulu_jdk/17.0.18-8/x64
+2026-01-22T02:22:35.5009326Z   JAVA_HOME_17_X64: /opt/hostedtoolcache/Java_Zulu_jdk/17.0.18-8/x64
+2026-01-22T02:22:35.5009673Z ##[endgroup]
+2026-01-22T02:22:35.6590804Z   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+2026-01-22T02:22:35.6591636Z                                  Dload  Upload   Total   Spent    Left  Speed
+2026-01-22T02:22:35.6592060Z 
+2026-01-22T02:22:36.0396480Z   0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+2026-01-22T02:22:37.0103637Z   4  540M    4 24.0M    0     0  63.0M      0  0:00:08 --:--:--  0:00:08 62.9M
+2026-01-22T02:22:38.0095124Z  41  540M   41  223M    0     0   165M      0  0:00:03  0:00:01  0:00:02  165M
+2026-01-22T02:22:38.5155922Z  80  540M   80  435M    0     0   185M      0  0:00:02  0:00:02 --:--:--  185M
+2026-01-22T02:22:38.5156655Z 100  540M  100  540M    0     0   189M      0  0:00:02  0:00:02 --:--:--  189M
+2026-01-22T02:23:02.2780533Z ##[group]Run flutter pub get
+2026-01-22T02:23:02.2780834Z [36;1mflutter pub get[0m
+2026-01-22T02:23:02.2813760Z shell: /usr/bin/bash -e {0}
+2026-01-22T02:23:02.2814003Z env:
+2026-01-22T02:23:02.2814262Z   JAVA_HOME: /opt/hostedtoolcache/Java_Zulu_jdk/17.0.18-8/x64
+2026-01-22T02:23:02.2814660Z   JAVA_HOME_17_X64: /opt/hostedtoolcache/Java_Zulu_jdk/17.0.18-8/x64
+2026-01-22T02:23:02.2815052Z   FLUTTER_ROOT: /opt/hostedtoolcache/flutter/stable-3.13.9-x64
+2026-01-22T02:23:02.2815381Z   PUB_CACHE: /home/runner/.pub-cache
+2026-01-22T02:23:02.2815624Z ##[endgroup]
+2026-01-22T02:23:02.7565210Z 
+2026-01-22T02:23:02.7570914Z   ╔════════════════════════════════════════════════════════════════════════════╗
+2026-01-22T02:23:02.7572004Z   ║                 Welcome to Flutter! - https://flutter.dev                  ║
+2026-01-22T02:23:02.7572878Z   ║                                                                            ║
+2026-01-22T02:23:02.7573851Z   ║ The Flutter tool uses Google Analytics to anonymously report feature usage ║
+2026-01-22T02:23:02.7574815Z   ║ statistics and basic crash reports. This data is used to help improve      ║
+2026-01-22T02:23:02.7575746Z   ║ Flutter tools over time.                                                   ║
+2026-01-22T02:23:02.7576495Z   ║                                                                            ║
+2026-01-22T02:23:02.7577307Z   ║ Flutter tool analytics are not sent on the very first run. To disable      ║
+2026-01-22T02:23:02.7578288Z   ║ reporting, type 'flutter config --no-analytics'. To display the current    ║
+2026-01-22T02:23:02.7579826Z   ║ setting, type 'flutter config'. If you opt out of analytics, an opt-out    ║
+2026-01-22T02:23:02.7580776Z   ║ event will be sent, and then no further information will be sent by the    ║
+2026-01-22T02:23:02.7581632Z   ║ Flutter tool.                                                              ║
+2026-01-22T02:23:02.7582247Z   ║                                                                            ║
+2026-01-22T02:23:02.7582718Z   ║ By downloading the Flutter SDK, you agree to the Google Terms of Service.  ║
+2026-01-22T02:23:02.7583250Z   ║ Note: The Google Privacy Policy describes how data is handled in this      ║
+2026-01-22T02:23:02.7583723Z   ║ service.                                                                   ║
+2026-01-22T02:23:02.7584100Z   ║                                                                            ║
+2026-01-22T02:23:02.7584551Z   ║ Moreover, Flutter includes the Dart SDK, which may send usage metrics and  ║
+2026-01-22T02:23:02.7585079Z   ║ crash reports to Google.                                                   ║
+2026-01-22T02:23:02.7585500Z   ║                                                                            ║
+2026-01-22T02:23:02.7585934Z   ║ Read about data we send with crash reports:                                ║
+2026-01-22T02:23:02.7586458Z   ║ https://flutter.dev/docs/reference/crash-reporting                         ║
+2026-01-22T02:23:02.7586936Z   ║                                                                            ║
+2026-01-22T02:23:02.7587422Z   ║ See Google's privacy policy:                                               ║
+2026-01-22T02:23:02.7587962Z   ║ https://policies.google.com/privacy                                        ║
+2026-01-22T02:23:02.7588522Z   ╚════════════════════════════════════════════════════════════════════════════╝
+2026-01-22T02:23:02.7588787Z 
+2026-01-22T02:23:07.6603505Z Resolving dependencies...
+2026-01-22T02:23:11.6749471Z + args 2.5.0 (2.7.0 available)
+2026-01-22T02:23:11.6749962Z + async 2.11.0 (2.13.0 available)
+2026-01-22T02:23:11.6750434Z + characters 1.3.0 (1.4.1 available)
+2026-01-22T02:23:11.6750781Z + clock 1.1.1 (1.1.2 available)
+2026-01-22T02:23:11.6751029Z + collection 1.17.2 (1.19.1 available)
+2026-01-22T02:23:11.6751289Z + connectivity_plus 5.0.2 (7.0.0 available)
+2026-01-22T02:23:11.6751629Z + connectivity_plus_platform_interface 1.2.4 (2.0.1 available)
+2026-01-22T02:23:11.6752376Z + crypto 3.0.3 (3.0.7 available)
+2026-01-22T02:23:11.6752643Z + dbus 0.7.11
+2026-01-22T02:23:11.6752825Z + dio 5.9.0
+2026-01-22T02:23:11.6753008Z + dio_web_adapter 1.1.1 (2.1.1 available)
+2026-01-22T02:23:11.6753269Z + ffi 2.1.0 (2.1.5 available)
+2026-01-22T02:23:11.6753476Z + file 7.0.1
+2026-01-22T02:23:11.6753692Z + flutter 0.0.0 from sdk flutter
+2026-01-22T02:23:11.6753945Z + flutter_secure_storage 9.2.4 (10.0.0 available)
+2026-01-22T02:23:11.6754264Z + flutter_secure_storage_linux 1.2.3 (3.0.0 available)
+2026-01-22T02:23:11.6754573Z + flutter_secure_storage_macos 3.1.3 (4.0.0 available)
+2026-01-22T02:23:11.6754943Z + flutter_secure_storage_platform_interface 1.1.2 (2.0.1 available)
+2026-01-22T02:23:11.6755303Z + flutter_secure_storage_web 1.2.1 (2.1.0 available)
+2026-01-22T02:23:11.6755613Z + flutter_secure_storage_windows 3.1.2 (4.1.0 available)
+2026-01-22T02:23:11.6755901Z + flutter_tts 3.8.5 (4.2.5 available)
+2026-01-22T02:23:11.6757534Z + flutter_web_plugins 0.0.0 from sdk flutter
+2026-01-22T02:23:11.6758026Z + http 1.1.0 (1.6.0 available)
+2026-01-22T02:23:11.6758401Z + http_parser 4.0.2 (4.1.2 available)
+2026-01-22T02:23:11.6758798Z + js 0.6.7 (0.7.2 available)
+2026-01-22T02:23:11.6759351Z + json_annotation 4.9.0
+2026-01-22T02:23:11.6759608Z + material_color_utilities 0.5.0 (0.13.0 available)
+2026-01-22T02:23:11.6759904Z + meta 1.9.1 (1.18.0 available)
+2026-01-22T02:23:11.6760158Z + mime 1.0.4 (2.0.0 available)
+2026-01-22T02:23:11.6760371Z + nested 1.0.0
+2026-01-22T02:23:11.6760555Z + nm 0.5.0
+2026-01-22T02:23:11.6760738Z + package_info_plus 4.2.0 (9.0.0 available)
+2026-01-22T02:23:11.6761062Z + package_info_plus_platform_interface 2.0.1 (3.2.1 available)
+2026-01-22T02:23:11.6761663Z + path 1.9.0 (1.9.1 available)
+2026-01-22T02:23:11.6761882Z + path_provider 2.1.3 (2.1.5 available)
+2026-01-22T02:23:11.6762148Z + path_provider_android 2.2.3 (2.2.22 available)
+2026-01-22T02:23:11.6762438Z + path_provider_foundation 2.3.2 (2.6.0 available)
+2026-01-22T02:23:11.6762712Z + path_provider_linux 2.2.1
+2026-01-22T02:23:11.6762949Z + path_provider_platform_interface 2.1.2
+2026-01-22T02:23:11.6763223Z + path_provider_windows 2.2.1 (2.3.0 available)
+2026-01-22T02:23:11.6763474Z + pedantic 1.11.1
+2026-01-22T02:23:11.6763686Z + permission_handler 11.0.1 (12.0.1 available)
+2026-01-22T02:23:11.6763996Z + permission_handler_android 11.1.0 (13.0.1 available)
+2026-01-22T02:23:11.6764307Z + permission_handler_apple 9.1.4 (9.4.7 available)
+2026-01-22T02:23:11.6764649Z + permission_handler_platform_interface 3.12.0 (4.3.0 available)
+2026-01-22T02:23:11.6764992Z + permission_handler_windows 0.1.3 (0.2.1 available)
+2026-01-22T02:23:11.6765285Z + petitparser 5.4.0 (7.0.1 available)
+2026-01-22T02:23:11.6765524Z + platform 3.1.4 (3.1.6 available)
+2026-01-22T02:23:11.6765761Z + plugin_platform_interface 2.1.8
+2026-01-22T02:23:11.6765978Z + provider 6.1.5+1
+2026-01-22T02:23:11.6766188Z + shared_preferences 2.2.3 (2.5.4 available)
+2026-01-22T02:23:11.6766479Z + shared_preferences_android 2.2.1 (2.4.18 available)
+2026-01-22T02:23:11.6766798Z + shared_preferences_foundation 2.3.5 (2.5.6 available)
+2026-01-22T02:23:11.6767147Z + shared_preferences_linux 2.3.2 (2.4.1 available)
+2026-01-22T02:23:11.6767477Z + shared_preferences_platform_interface 2.3.2 (2.4.1 available)
+2026-01-22T02:23:11.6767819Z + shared_preferences_web 2.2.1 (2.4.3 available)
+2026-01-22T02:23:11.6768115Z + shared_preferences_windows 2.3.2 (2.4.1 available)
+2026-01-22T02:23:11.6768397Z + sky_engine 0.0.99 from sdk flutter
+2026-01-22T02:23:11.6768631Z + source_span 1.10.1
+2026-01-22T02:23:11.6768827Z + speech_to_text 6.6.0 (7.3.0 available)
+2026-01-22T02:23:11.6769375Z + speech_to_text_macos 1.1.0
+2026-01-22T02:23:11.6769618Z + speech_to_text_platform_interface 2.3.0
+2026-01-22T02:23:11.6769865Z + sprintf 7.0.0
+2026-01-22T02:23:11.6770044Z + string_scanner 1.4.1
+2026-01-22T02:23:11.6770241Z + term_glyph 1.2.2
+2026-01-22T02:23:11.6770426Z + typed_data 1.3.2 (1.4.0 available)
+2026-01-22T02:23:11.6770662Z + url_launcher 6.2.4 (6.3.2 available)
+2026-01-22T02:23:11.6771103Z + url_launcher_android 6.3.0 (6.3.28 available)
+2026-01-22T02:23:11.6771381Z + url_launcher_ios 6.2.4 (6.3.6 available)
+2026-01-22T02:23:11.6771637Z + url_launcher_linux 3.1.1 (3.2.2 available)
+2026-01-22T02:23:11.6771887Z + url_launcher_macos 3.2.0 (3.2.5 available)
+2026-01-22T02:23:11.6772145Z + url_launcher_platform_interface 2.3.2
+2026-01-22T02:23:11.6772388Z + url_launcher_web 2.2.0 (2.4.2 available)
+2026-01-22T02:23:11.6772646Z + url_launcher_windows 3.1.1 (3.1.5 available)
+2026-01-22T02:23:11.6772891Z + uuid 4.2.2 (4.5.2 available)
+2026-01-22T02:23:11.6773114Z + vector_math 2.1.4 (2.2.0 available)
+2026-01-22T02:23:11.6773354Z + web 0.1.4-beta (1.1.1 available)
+2026-01-22T02:23:11.6773576Z + win32 5.1.1 (5.15.0 available)
+2026-01-22T02:23:11.6773804Z + xdg_directories 1.0.4 (1.1.0 available)
+2026-01-22T02:23:11.6774038Z + xml 6.3.0 (6.6.1 available)
+2026-01-22T02:23:11.6780804Z Changed 80 dependencies!
+2026-01-22T02:23:12.0621622Z The Flutter CLI developer tool uses Google Analytics to report usage and diagnostic data
+2026-01-22T02:23:12.0622762Z along with package dependencies, and crash reporting to send basic crash reports.
+2026-01-22T02:23:12.0623769Z This data is used to help improve the Dart platform, Flutter framework, and related tools.
+2026-01-22T02:23:12.0624349Z 
+2026-01-22T02:23:12.0624530Z Telemetry is not sent on the very first run.
+2026-01-22T02:23:12.0625161Z To disable reporting of telemetry, run this terminal command:
+2026-01-22T02:23:12.0625607Z 
+2026-01-22T02:23:12.0625792Z flutter --disable-telemetry.
+2026-01-22T02:23:12.0626284Z If you opt out of telemetry, an opt-out event will be sent,
+2026-01-22T02:23:12.0627177Z and then no further information will be sent.
+2026-01-22T02:23:12.0627649Z This data is collected in accordance with the
+2026-01-22T02:23:12.0628302Z Google Privacy Policy (https://policies.google.com/privacy).
+2026-01-22T02:23:12.0628731Z 
+2026-01-22T02:23:12.0736158Z ##[group]Run flutter build apk --release
+2026-01-22T02:23:12.0736746Z [36;1mflutter build apk --release[0m
+2026-01-22T02:23:12.0775144Z shell: /usr/bin/bash -e {0}
+2026-01-22T02:23:12.0775426Z env:
+2026-01-22T02:23:12.0775690Z   JAVA_HOME: /opt/hostedtoolcache/Java_Zulu_jdk/17.0.18-8/x64
+2026-01-22T02:23:12.0776112Z   JAVA_HOME_17_X64: /opt/hostedtoolcache/Java_Zulu_jdk/17.0.18-8/x64
+2026-01-22T02:23:12.0776514Z   FLUTTER_ROOT: /opt/hostedtoolcache/flutter/stable-3.13.9-x64
+2026-01-22T02:23:12.0776839Z   PUB_CACHE: /home/runner/.pub-cache
+2026-01-22T02:23:12.0777088Z ##[endgroup]
+2026-01-22T02:23:12.6094566Z 
+2026-01-22T02:26:47.3801365Z Running Gradle task 'assembleRelease'...                        
+2026-01-22T02:26:47.3802285Z Checking the license for package Android SDK Build-Tools 33.0.1 in /usr/local/lib/android/sdk/licenses
+2026-01-22T02:26:47.3803088Z License for package Android SDK Build-Tools 33.0.1 accepted.
+2026-01-22T02:26:47.3803749Z Preparing "Install Android SDK Build-Tools 33.0.1 v.33.0.1".
+2026-01-22T02:26:48.6646889Z "Install Android SDK Build-Tools 33.0.1 v.33.0.1" ready.
+2026-01-22T02:26:48.6650176Z Installing Android SDK Build-Tools 33.0.1 in /usr/local/lib/android/sdk/build-tools/33.0.1
+2026-01-22T02:26:48.6651477Z "Install Android SDK Build-Tools 33.0.1 v.33.0.1" complete.
+2026-01-22T02:26:48.8647530Z "Install Android SDK Build-Tools 33.0.1 v.33.0.1" finished.
+2026-01-22T02:26:48.9650590Z Checking the license for package Android SDK Platform 33 in /usr/local/lib/android/sdk/licenses
+2026-01-22T02:26:48.9656762Z License for package Android SDK Platform 33 accepted.
+2026-01-22T02:26:48.9663182Z Preparing "Install Android SDK Platform 33 (revision 3)".
+2026-01-22T02:26:52.0658199Z "Install Android SDK Platform 33 (revision 3)" ready.
+2026-01-22T02:26:52.0663403Z Installing Android SDK Platform 33 in /usr/local/lib/android/sdk/platforms/android-33
+2026-01-22T02:26:52.0670924Z "Install Android SDK Platform 33 (revision 3)" complete.
+2026-01-22T02:26:52.0674087Z "Install Android SDK Platform 33 (revision 3)" finished.
+2026-01-22T02:26:52.3646172Z Checking the license for package Android SDK Platform 31 in /usr/local/lib/android/sdk/licenses
+2026-01-22T02:26:52.3652290Z License for package Android SDK Platform 31 accepted.
+2026-01-22T02:26:52.3657290Z Preparing "Install Android SDK Platform 31 (revision 1)".
+2026-01-22T02:26:55.2651071Z "Install Android SDK Platform 31 (revision 1)" ready.
+2026-01-22T02:26:55.2652982Z Installing Android SDK Platform 31 in /usr/local/lib/android/sdk/platforms/android-31
+2026-01-22T02:26:55.2654011Z "Install Android SDK Platform 31 (revision 1)" complete.
+2026-01-22T02:26:55.2661645Z "Install Android SDK Platform 31 (revision 1)" finished.
+2026-01-22T02:27:39.1665045Z lib/ui/chat/chat_page.dart:86:9: Error: No named parameter with the name 'onProgress'.
+2026-01-22T02:27:39.1667739Z         onProgress: (received, total) {},
+2026-01-22T02:27:39.1669399Z         ^^^^^^^^^^
+2026-01-22T02:27:39.1671617Z lib/ui/chat/chat_page.dart:335:9: Context: Found this candidate, but the arguments don't match.
+2026-01-22T02:27:39.1672403Z   const DownloadProgressDialog({
+2026-01-22T02:27:39.1675980Z         ^^^^^^^^^^^^^^^^^^^^^^
+2026-01-22T02:27:39.1676999Z lib/ui/chat/chat_page.dart:417:17: Error: The method '_showInstallDialog' isn't defined for the class '_DownloadProgressDialogState'.
+2026-01-22T02:27:39.1681328Z  - '_DownloadProgressDialogState' is from 'package:gemini_voice_app/ui/chat/chat_page.dart' ('lib/ui/chat/chat_page.dart').
+2026-01-22T02:27:39.1682955Z Try correcting the name to the name of an existing method, or defining a method named '_showInstallDialog'.
+2026-01-22T02:27:39.1683786Z                 _showInstallDialog(downloadDir);
+2026-01-22T02:27:39.1684236Z                 ^^^^^^^^^^^^^^^^^^
+2026-01-22T02:27:49.1691955Z Target kernel_snapshot failed: Exception
+2026-01-22T02:27:49.1694928Z 
+2026-01-22T02:27:49.1696437Z 
+2026-01-22T02:27:49.1699736Z FAILURE: Build failed with an exception.
+2026-01-22T02:27:49.1701412Z 
+2026-01-22T02:27:49.1703313Z * What went wrong:
+2026-01-22T02:27:49.1704072Z Execution failed for task ':app:compileFlutterBuildRelease'.
+2026-01-22T02:27:49.1706361Z > Process 'command '/opt/hostedtoolcache/flutter/stable-3.13.9-x64/bin/flutter'' finished with non-zero exit value 1
+2026-01-22T02:27:49.1707335Z 
+2026-01-22T02:27:49.1708073Z * Try:
+2026-01-22T02:27:49.1708688Z > Run with --stacktrace option to get the stack trace.
+2026-01-22T02:27:49.1710864Z > Run with --info or --debug option to get more log output.
+2026-01-22T02:27:49.1711653Z > Run with --scan to get full insights.
+2026-01-22T02:27:49.1713163Z 
+2026-01-22T02:27:49.1714571Z * Get more help at https://help.gradle.org
+2026-01-22T02:27:49.1715163Z 
+2026-01-22T02:27:49.1717158Z BUILD FAILED in 4m 36s
+2026-01-22T02:27:49.6577151Z Running Gradle task 'assembleRelease'...                          277.0s
+2026-01-22T02:27:49.6628144Z Gradle task assembleRelease failed with exit code 1
+2026-01-22T02:27:49.6785837Z ##[error]Process completed with exit code 1.
+2026-01-22T02:27:49.6981034Z Post job cleanup.
+2026-01-22T02:27:49.7061971Z Post job cleanup.
+2026-01-22T02:27:49.9011102Z Post job cleanup.
+2026-01-22T02:27:49.9834824Z [command]/usr/bin/git version
+2026-01-22T02:27:49.9878591Z git version 2.52.0
+2026-01-22T02:27:49.9928633Z Temporarily overriding HOME='/home/runner/work/_temp/c423fa1c-b75c-4eb4-91ef-dd3ec473b8f6' before making global git config changes
+2026-01-22T02:27:49.9930117Z Adding repository directory to the temporary git global config as a safe directory
+2026-01-22T02:27:49.9932083Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/gemini-voice-app/gemini-voice-app
+2026-01-22T02:27:49.9974948Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-01-22T02:27:50.0013349Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-01-22T02:27:50.0303657Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-01-22T02:27:50.0330738Z http.https://github.com/.extraheader
+2026-01-22T02:27:50.0343390Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-01-22T02:27:50.0385107Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-01-22T02:27:50.0770616Z Cleaning up orphan processes
+2026-01-22T02:27:50.1095790Z Terminate orphan process: pid (2453) (java)
+2026-01-22T02:27:50.1130261Z Terminate orphan process: pid (2774) (java)
