@@ -89,7 +89,7 @@ class _ChatPageState extends State<ChatPage> {
       downloadUrl: downloadUrl,
       onProgress: (received, total) {
         if (mounted) {
-          final progress = (received / total * 100).toIntAsFixed(0);
+          final progress = (received / total * 100).round();
           Navigator.of(context).pop();
           showDialog(
             context: context,
