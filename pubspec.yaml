@@ -20,9 +20,7 @@ dependencies:
   connectivity_plus: ^5.0.2
   uuid: ^4.0.0
   dio: ^5.4.0
-  open_file: ^3.3.2
   path_provider: ^2.1.1
-  android_intent_plus: ^4.0.3
 
 flutter:
   uses-material-design: true

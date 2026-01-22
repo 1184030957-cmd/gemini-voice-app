@@ -3,8 +3,7 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
-import 'package:open_file/open_file.dart';
-import 'package:android_intent_plus/android_intent_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class UpdateService {
   static const String _githubApiUrl =
@@ -78,25 +77,16 @@ class UpdateService {
   }
 
   Future<void> installApk(String filePath) async {
-    try {
-      final file = File(filePath);
-      if (!file.existsSync()) {
-        throw Exception('APK文件不存在');
-      }
+    final file = File(filePath);
+    if (!file.existsSync()) {
+      throw Exception('APK文件不存在');
+    }
 
-      if (Platform.isAndroid) {
-        final intent = AndroidIntent(
-          action: 'android.intent.action.VIEW',
-          type: 'application/vnd.android.package-archive',
-          data: Uri.file(filePath).toString(),
-          flags: [Flag.FLAG_GRANT_READ_URI_PERMISSION],
-        );
-        await intent.launch();
-      } else {
-        await OpenFile.open(filePath);
-      }
-    } catch (e) {
-      throw Exception('安装失败: $e');
+    final uri = Uri.file(filePath);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    } else {
+      throw Exception('无法打开APK文件');
     }
   }
 }
