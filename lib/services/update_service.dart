@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
+import 'package:android_intent_plus/android_intent.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class UpdateService {
@@ -12,10 +13,24 @@ class UpdateService {
   final Dio _dio = Dio();
 
   int compareVersions(String v1, String v2) {
-    final parts1 = v1.split('.').map(int.parse).toList();
-    final parts2 = v2.split('.').map(int.parse).toList();
+    String cleanVersion(String v) {
+      v = v.trim();
+      int plusIndex = v.indexOf('+');
+      if (plusIndex > 0) {
+        v = v.substring(0, plusIndex);
+      }
+      v = v.replaceAll(RegExp(r'[^0-9.]'), '');
+      return v;
+    }
 
-    for (int i = 0; i < 3; i++) {
+    v1 = cleanVersion(v1);
+    v2 = cleanVersion(v2);
+
+    final parts1 = v1.split('.').map((e) => int.tryParse(e) ?? 0).toList();
+    final parts2 = v2.split('.').map((e) => int.tryParse(e) ?? 0).toList();
+
+    int maxLength = parts1.length > parts2.length ? parts1.length : parts2.length;
+    for (int i = 0; i < maxLength; i++) {
       final p1 = i < parts1.length ? parts1[i] : 0;
       final p2 = i < parts2.length ? parts2[i] : 0;
       if (p1 > p2) return 1;
@@ -51,7 +66,7 @@ class UpdateService {
   }) async {
     try {
       final directory = await getExternalStorageDirectory();
-      final savePath = '${directory!.path}/gemini-voice-app.apk';
+      final savePath = '${directory!.path}/gemini_voice_app.apk';
 
       await _dio.download(
         downloadUrl,
@@ -79,14 +94,40 @@ class UpdateService {
   Future<void> installApk(String filePath) async {
     final file = File(filePath);
     if (!file.existsSync()) {
-      throw Exception('APK文件不存在');
+      throw Exception('APK文件不存在: $filePath');
     }
 
-    final uri = Uri.file(filePath);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri);
-    } else {
-      throw Exception('无法打开APK文件');
+    try {
+      final fileInfo = await file.stat();
+      if (fileInfo.size == 0) {
+        throw Exception('APK文件为空');
+      }
+
+      if (Platform.isAndroid) {
+        final intent = AndroidIntent(
+          action: 'android.intent.action.VIEW',
+          data: Uri.parse('file://$filePath'),
+          type: 'application/vnd.android.package-archive',
+          flags: <int>[
+            Flag.FLAG_ACTIVITY_NEW_TASK,
+            Flag.FLAG_GRANT_READ_URI_PERMISSION,
+          ],
+        );
+        await intent.launch();
+      } else {
+        final uri = Uri.file(filePath);
+        if (await canLaunchUrl(uri)) {
+          await launchUrl(uri);
+        } else {
+          throw Exception('无法打开APK文件');
+        }
+      }
+    } catch (e) {
+      throw Exception('安装失败: $e');
     }
+  }
+
+  String getDownloadPath() {
+    return '/storage/emulated/0/Android/data/com.example.gemini_voice_app/files/gemini_voice_app.apk';
   }
 }

@@ -19,6 +19,7 @@ class SpeechService {
   String _lastWords = '';
   String _errorMessage = '';
   Timer? _silenceTimer;
+  bool _isInitialized = false;
 
   SpeechState get state => _state;
   String get lastWords => _lastWords;
@@ -32,35 +33,37 @@ class SpeechService {
   Future<bool> initialize() async {
     _updateState(SpeechState.initializing);
     _errorMessage = '';
+    _isInitialized = false;
 
     try {
       final micStatus = await Permission.microphone.status;
-      final audioStatus = await Permission.audio.status;
 
-      if (!micStatus.isGranted && !audioStatus.isGranted) {
-        final result = await [
-          Permission.microphone,
-          Permission.audio,
-        ].request();
-
-        if (!result[Permission.microphone]!.isGranted) {
-          _errorMessage = '麦克风权限被拒绝，请在系统设置中手动开启';
+      if (!micStatus.isGranted) {
+        final result = await Permission.microphone.request();
+        if (!result.isGranted) {
+          _errorMessage = '麦克风权限被拒绝。请前往手机设置 → 应用设置 → Gemini Voice → 权限 → 开启麦克风权限';
           _updateState(SpeechState.permissionDenied);
           return false;
         }
       }
 
-      if (micStatus.isPermanentlyDenied || audioStatus.isPermanentlyDenied) {
-        _errorMessage = '麦克风权限已被永久拒绝，请前往系统设置手动开启';
+      if (micStatus.isPermanentlyDenied) {
+        _errorMessage = '麦克风权限已被永久拒绝。请前往手机设置 → 应用设置 → Gemini Voice → 权限 → 开启麦克风权限';
         _updateState(SpeechState.permissionDenied);
         return false;
       }
 
-      bool speechInitialized = await _speech.initialize(
+      bool hasSpeech = await _speech.initialize(
         onError: (error) {
-          _errorMessage = '语音服务错误: ${error.errorMsg}';
+          if (error.errorMsg.contains('not available')) {
+            _errorMessage = '当前设备不支持语音识别功能。请使用文字输入或尝试更新系统。';
+          } else if (error.errorMsg.contains('permission')) {
+            _errorMessage = '麦克风权限被拒绝。请前往手机设置开启权限。';
+          } else {
+            _errorMessage = '语音服务错误: ${error.errorMsg}';
+          }
           _updateState(SpeechState.error);
-          onError?.call(error.errorMsg);
+          onError?.call(_errorMessage);
         },
         onStatus: (status) {
           onStatus?.call(status);
@@ -72,16 +75,31 @@ class SpeechService {
         },
       );
 
-      if (speechInitialized) {
+      if (hasSpeech) {
+        _isInitialized = true;
         _updateState(SpeechState.available);
+        
+        _speech.listen(
+          onResult: (result) {
+            if (result.finalResult) {
+              _lastWords = result.recognizedWords;
+              _stopListening();
+              onResult?.call(_lastWords);
+            }
+          },
+          localeId: "zh_CN",
+          partialResults: false,
+        );
+        
+        await _speech.stop();
         return true;
       } else {
-        _errorMessage = '语音服务初始化失败';
+        _errorMessage = '语音服务初始化失败。您的设备可能不支持语音识别功能。';
         _updateState(SpeechState.notAvailable);
         return false;
       }
     } catch (e) {
-      _errorMessage = '初始化异常: $e';
+      _errorMessage = '语音服务初始化异常: $e。请尝试重启应用或更新系统。';
       _updateState(SpeechState.error);
       return false;
     }
@@ -105,14 +123,18 @@ class SpeechService {
 
   bool startListening({Function(String)? onPartialResult}) {
     if (_state == SpeechState.permissionDenied) {
-      onError?.call('请先开启麦克风权限');
+      _errorMessage = '请先开启麦克风权限';
+      onError?.call(_errorMessage);
       return false;
     }
 
-    if (_state == SpeechState.notAvailable ||
-        _state == SpeechState.error ||
-        _state == SpeechState.initializing) {
-      onError?.call('语音服务未就绪');
+    if (_state == SpeechState.notAvailable || _state == SpeechState.error) {
+      onError?.call(_errorMessage);
+      return false;
+    }
+
+    if (_state == SpeechState.initializing) {
+      onError?.call('语音服务正在初始化，请稍候...');
       return false;
     }
 
@@ -131,7 +153,7 @@ class SpeechService {
             _stopListening();
             onResult?.call(_lastWords);
           } else if (onPartialResult != null && result.recognizedWords.isNotEmpty) {
-            onPartialResult.call(result.recognizedWords);
+            onPartialResult(result.recognizedWords);
           }
         },
         listenFor: Duration(seconds: 60),
@@ -206,7 +228,7 @@ class SpeechService {
   String getStateMessage() {
     switch (_state) {
       case SpeechState.notAvailable:
-        return '语音服务不可用';
+        return '语音功能不可用';
       case SpeechState.permissionDenied:
         return '麦克风权限被拒绝';
       case SpeechState.initializing:

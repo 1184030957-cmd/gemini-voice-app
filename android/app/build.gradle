@@ -4,6 +4,15 @@ plugins {
     id "dev.flutter.flutter-gradle-plugin"
 }
 
+def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
+if (flutterVersionCode == null) {
+    flutterVersionCode = '1'
+}
+def flutterVersionName = localProperties.getProperty('flutter.versionName')
+if (flutterVersionName == null) {
+    flutterVersionName = '1.0'
+}
+
 android {
     namespace "com.example.gemini_voice_app"
     compileSdkVersion 34
@@ -21,8 +30,8 @@ android {
         applicationId "com.example.gemini_voice_app"
         minSdkVersion 21
         targetSdkVersion 34
-        versionCode 1
-        versionName "1.0"
+        versionCode flutterVersionCode.toInteger()
+        versionName flutterVersionName
     }
 
     buildTypes {

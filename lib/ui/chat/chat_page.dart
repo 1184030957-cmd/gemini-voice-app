@@ -82,8 +82,10 @@ class _ChatPageState extends State<ChatPage> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => _DownloadProgressDialog(),
-    );
+      builder: (context) => DownloadProgressDialog(
+        onProgress: (received, total) {},
+      ),
+    ).then((_) {});
 
     _updateService.downloadUpdate(
       downloadUrl: downloadUrl,
@@ -94,8 +96,8 @@ class _ChatPageState extends State<ChatPage> {
           showDialog(
             context: context,
             barrierDismissible: false,
-            builder: (context) => _DownloadProgressDialog(
-              progress: progress.toDouble(),
+            builder: (context) => DownloadProgressDialog(
+              initialProgress: progress,
               received: received,
               total: total,
             ),
@@ -129,7 +131,22 @@ class _ChatPageState extends State<ChatPage> {
           children: [
             const Icon(Icons.check_circle, color: Colors.green, size: 64),
             const SizedBox(height: 16),
-            const Text('APK 已下载完成，是否立即安装？'),
+            const Text('APK 已下载完成'),
+            const SizedBox(height: 8),
+            Text(
+              '安装包位置:',
+              style: TextStyle(fontSize: 12, color: Colors.grey),
+            ),
+            Text(
+              filePath,
+              style: TextStyle(fontSize: 10, color: Colors.grey),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              '点击"立即安装"开始更新',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
           ],
         ),
         actions: [
@@ -140,7 +157,11 @@ class _ChatPageState extends State<ChatPage> {
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
-              _updateService.installApk(filePath);
+              _updateService.installApk(filePath).catchError((e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('安装失败: $e')),
+                );
+              });
             },
             child: const Text('立即安装'),
           ),
@@ -306,44 +327,99 @@ class _ChatPageState extends State<ChatPage> {
   }
 }
 
-class _DownloadProgressDialog extends StatefulWidget {
-  final double? progress;
-  final int? received;
-  final int? total;
+class DownloadProgressDialog extends StatefulWidget {
+  final int initialProgress;
+  final int received;
+  final int total;
 
-  const _DownloadProgressDialog({this.progress, this.received, this.total});
+  const DownloadProgressDialog({
+    super.key,
+    this.initialProgress = 0,
+    this.received = 0,
+    this.total = 0,
+  });
 
   @override
-  State<_DownloadProgressDialog> createState() => _DownloadProgressDialogState();
+  State<DownloadProgressDialog> createState() => _DownloadProgressDialogState();
 }
 
-class _DownloadProgressDialogState extends State<_DownloadProgressDialog> {
+class _DownloadProgressDialogState extends State<DownloadProgressDialog> {
+  int _progress = 0;
+  int _received = 0;
+  int _total = 0;
+  bool _isComplete = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _progress = widget.initialProgress;
+    _received = widget.received;
+    _total = widget.total;
+  }
+
+  void updateProgress(int received, int total) {
+    if (mounted) {
+      setState(() {
+        _received = received;
+        _total = total;
+        _progress = total > 0 ? (received * 100 / total).round() : 0;
+      });
+    }
+  }
+
+  void completeDownload() {
+    if (mounted) {
+      setState(() {
+        _progress = 100;
+        _isComplete = true;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final progress = widget.progress ?? 0;
-    final received = widget.received ?? 0;
-    final total = widget.total ?? 0;
+    String receivedText = _formatBytes(_received);
+    String totalText = _formatBytes(_total);
 
-    String receivedText = _formatBytes(received);
-    String totalText = _formatBytes(total);
-
-    return AlertDialog(
-      title: const Text('正在下载更新'),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          LinearProgressIndicator(
-            value: progress / 100,
-            minHeight: 8,
-            backgroundColor: Colors.grey[200],
-            valueColor: const AlwaysStoppedAnimation<Color>(Colors.blue),
-          ),
-          const SizedBox(height: 16),
-          Text('$progress%'),
-          const SizedBox(height: 8),
-          Text('$receivedText / $totalText'),
-          const SizedBox(height: 8),
-          const Text('请稍候...', style: TextStyle(color: Colors.grey)),
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: AlertDialog(
+        title: Text(_isComplete ? '下载完成' : '正在下载更新'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            LinearProgressIndicator(
+              value: _progress / 100,
+              minHeight: 8,
+              backgroundColor: Colors.grey[200],
+              valueColor: const AlwaysStoppedAnimation<Color>(Colors.blue),
+            ),
+            const SizedBox(height: 16),
+            Text('$_progress%'),
+            const SizedBox(height: 8),
+            Text('$receivedText / $totalText'),
+            const SizedBox(height: 8),
+            Text(
+              _isComplete ? '点击安装按钮开始安装' : '请稍候...',
+              style: TextStyle(
+                color: _isComplete ? Colors.green : Colors.grey,
+                fontWeight: _isComplete ? FontWeight.bold : FontWeight.normal,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          if (_isComplete)
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                final downloadDir = '/storage/emulated/0/Android/data/com.example.gemini_voice_app/files';
+                _showInstallDialog(downloadDir);
+              },
+              child: const Text('安装'),
+            )
+          else
+            const Text('下载中...'),
         ],
       ),
     );
