@@ -79,47 +79,26 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   void _startDownload(String downloadUrl) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => const DownloadProgressDialog(),
-    );
-
-    _updateService.downloadUpdate(
-      downloadUrl: downloadUrl,
-      onProgress: (received, total) {
-        if (mounted) {
-          final progress = (received / total * 100).round();
-          Navigator.of(context).pop();
-          showDialog(
-            context: context,
-            barrierDismissible: false,
-            builder: (context) => DownloadProgressDialog(
-              initialProgress: progress,
-              received: received,
-              total: total,
-            ),
-          );
-        }
-      },
-      onComplete: (filePath) {
-        if (mounted) {
-          Navigator.of(context).pop();
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => InstallReadyDialog(filePath: filePath),
-            ),
-          );
-        }
-      },
-      onError: (error) {
-        if (mounted) {
-          Navigator.of(context).pop();
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('下载失败: $error')),
-          );
-        }
-      },
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => DownloadProgressPage(
+          downloadUrl: downloadUrl,
+          onComplete: (filePath) {
+            Navigator.of(context).pop();
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => InstallReadyDialog(filePath: filePath),
+              ),
+            );
+          },
+          onError: (error) {
+            Navigator.of(context).pop();
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('下载失败: $error')),
+            );
+          },
+        ),
+      ),
     );
   }
 
@@ -146,6 +125,10 @@ class _ChatPageState extends State<ChatPage> {
 
       final latestVersion = releaseInfo['version'] as String;
       final comparison = _updateService.compareVersions(latestVersion, currentVersion);
+
+      print('当前版本: $currentVersion');
+      print('最新版本: $latestVersion');
+      print('比较结果: $comparison');
 
       if (comparison > 0) {
         _showUpdateDialog(releaseInfo);
@@ -280,106 +263,74 @@ class _ChatPageState extends State<ChatPage> {
   }
 }
 
-class DownloadProgressDialog extends StatefulWidget {
-  final int initialProgress;
-  final int received;
-  final int total;
-  final String filePath;
+class DownloadProgressPage extends StatefulWidget {
+  final String downloadUrl;
+  final Function(String) onComplete;
+  final Function(String) onError;
 
-  const DownloadProgressDialog({
+  const DownloadProgressPage({
     super.key,
-    this.initialProgress = 0,
-    this.received = 0,
-    this.total = 0,
-    this.filePath = '',
+    required this.downloadUrl,
+    required this.onComplete,
+    required this.onError,
   });
 
   @override
-  State<DownloadProgressDialog> createState() => _DownloadProgressDialogState();
+  State<DownloadProgressPage> createState() => _DownloadProgressPageState();
 }
 
-class _DownloadProgressDialogState extends State<DownloadProgressDialog> {
+class _DownloadProgressPageState extends State<DownloadProgressPage> {
   int _progress = 0;
   int _received = 0;
   int _total = 0;
   bool _isComplete = false;
+  bool _hasError = false;
+  String _errorMessage = '';
 
   @override
   void initState() {
     super.initState();
-    _progress = widget.initialProgress;
-    _received = widget.received;
-    _total = widget.total;
+    _startDownload();
   }
 
-  void updateProgress(int received, int total) {
-    if (mounted) {
-      setState(() {
-        _received = received;
-        _total = total;
-        _progress = total > 0 ? (received * 100 / total).round() : 0;
-      });
-    }
-  }
-
-  void completeDownload() {
-    if (mounted) {
-      setState(() {
-        _progress = 100;
-        _isComplete = true;
-      });
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    String receivedText = _formatBytes(_received);
-    String totalText = _formatBytes(_total);
-
-    return WillPopScope(
-      onWillPop: () async => false,
-      child: AlertDialog(
-        title: Text(_isComplete ? '下载完成' : '正在下载更新'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            LinearProgressIndicator(
-              value: _progress / 100,
-              minHeight: 8,
-              backgroundColor: Colors.grey[200],
-              valueColor: const AlwaysStoppedAnimation<Color>(Colors.blue),
-            ),
-            const SizedBox(height: 16),
-            Text('$_progress%'),
-            const SizedBox(height: 8),
-            Text('$receivedText / $totalText'),
-            const SizedBox(height: 8),
-            Text(
-              _isComplete ? '点击安装按钮开始安装' : '请稍候...',
-              style: TextStyle(
-                color: _isComplete ? Colors.green : Colors.grey,
-                fontWeight: _isComplete ? FontWeight.bold : FontWeight.normal,
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          if (_isComplete)
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => InstallReadyDialog(filePath: widget.filePath),
-                  ),
-                );
-              },
-              child: const Text('安装'),
-            )
-          else
-            const Text('下载中...'),
-        ],
-      ),
+  void _startDownload() {
+    context.read<UpdateService>().downloadUpdate(
+      downloadUrl: widget.downloadUrl,
+      onProgress: (received, total) {
+        if (mounted) {
+          setState(() {
+            _received = received;
+            _total = total;
+            _progress = total > 0 ? (received * 100 / total).round() : 0;
+          });
+        }
+      },
+      onComplete: (filePath) {
+        if (mounted) {
+          setState(() {
+            _progress = 100;
+            _isComplete = true;
+          });
+          Future.delayed(const Duration(milliseconds: 500), () {
+            if (mounted) {
+              widget.onComplete(filePath);
+            }
+          });
+        }
+      },
+      onError: (error) {
+        if (mounted) {
+          setState(() {
+            _hasError = true;
+            _errorMessage = error;
+          });
+          Future.delayed(const Duration(milliseconds: 1500), () {
+            if (mounted) {
+              widget.onError(error);
+            }
+          });
+        }
+      },
     );
   }
 
@@ -387,6 +338,80 @@ class _DownloadProgressDialogState extends State<DownloadProgressDialog> {
     if (bytes < 1024) return '$bytes B';
     if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} KB';
     return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    String receivedText = _formatBytes(_received);
+    String totalText = _formatBytes(_total);
+
+    Color statusColor = _hasError ? Colors.red : (_isComplete ? Colors.green : Colors.blue);
+
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(_isComplete ? '下载完成' : (_hasError ? '下载失败' : '正在下载更新')),
+          automaticallyImplyLeading: false,
+        ),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(32.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  _isComplete ? Icons.check_circle : (_hasError ? Icons.error : Icons.download),
+                  size: 80,
+                  color: statusColor,
+                ),
+                const SizedBox(height: 24),
+                Text(
+                  _isComplete ? '下载完成' : (_hasError ? '下载失败' : '$_progress%'),
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: statusColor,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  '$receivedText / $totalText',
+                  style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                ),
+                const SizedBox(height: 32),
+                LinearProgressIndicator(
+                  value: _progress / 100,
+                  minHeight: 12,
+                  backgroundColor: Colors.grey[200],
+                  valueColor: AlwaysStoppedAnimation<Color>(statusColor),
+                ),
+                const SizedBox(height: 24),
+                if (_isComplete)
+                  ElevatedButton(
+                    onPressed: () {
+                      final downloadDir = context.read<UpdateService>().getDownloadPath();
+                      widget.onComplete(downloadDir);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                    ),
+                    child: const Text('开始安装', style: TextStyle(fontSize: 18)),
+                  )
+                else if (_hasError)
+                  Text(
+                    _errorMessage,
+                    style: TextStyle(color: Colors.red, fontSize: 14),
+                    textAlign: TextAlign.center,
+                  )
+                else
+                  const Text('请稍候...', style: TextStyle(color: Colors.grey)),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
 

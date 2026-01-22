@@ -39,29 +39,14 @@ class SpeechService {
       final micStatus = await Permission.microphone.status;
 
       if (!micStatus.isGranted) {
-        final result = await Permission.microphone.request();
-        if (!result.isGranted) {
-          _errorMessage = '麦克风权限被拒绝。请前往手机设置 → 应用设置 → Gemini Voice → 权限 → 开启麦克风权限';
-          _updateState(SpeechState.permissionDenied);
-          return false;
-        }
-      }
-
-      if (micStatus.isPermanentlyDenied) {
-        _errorMessage = '麦克风权限已被永久拒绝。请前往手机设置 → 应用设置 → Gemini Voice → 权限 → 开启麦克风权限';
         _updateState(SpeechState.permissionDenied);
+        _errorMessage = '麦克风权限未开启。请前往手机设置 → 应用设置 → Gemini Voice → 权限 → 开启麦克风权限';
         return false;
       }
 
-      bool hasSpeech = await _speech.initialize(
+      bool isInitialized = await _speech.initialize(
         onError: (error) {
-          if (error.errorMsg.contains('not available')) {
-            _errorMessage = '当前设备不支持语音识别功能。请使用文字输入或尝试更新系统。';
-          } else if (error.errorMsg.contains('permission')) {
-            _errorMessage = '麦克风权限被拒绝。请前往手机设置开启权限。';
-          } else {
-            _errorMessage = '语音服务错误: ${error.errorMsg}';
-          }
+          _errorMessage = _getErrorMessage(error.errorMsg);
           _updateState(SpeechState.error);
           onError?.call(_errorMessage);
         },
@@ -75,34 +60,33 @@ class SpeechService {
         },
       );
 
-      if (hasSpeech) {
+      if (isInitialized) {
         _isInitialized = true;
         _updateState(SpeechState.available);
-        
-        _speech.listen(
-          onResult: (result) {
-            if (result.finalResult) {
-              _lastWords = result.recognizedWords;
-              _stopListening();
-              onResult?.call(_lastWords);
-            }
-          },
-          localeId: "zh_CN",
-          partialResults: false,
-        );
-        
-        await _speech.stop();
         return true;
       } else {
-        _errorMessage = '语音服务初始化失败。您的设备可能不支持语音识别功能。';
         _updateState(SpeechState.notAvailable);
+        _errorMessage = '语音服务初始化失败。您的设备可能不支持语音识别功能。';
         return false;
       }
     } catch (e) {
-      _errorMessage = '语音服务初始化异常: $e。请尝试重启应用或更新系统。';
+      _errorMessage = '语音服务初始化异常: $e';
       _updateState(SpeechState.error);
       return false;
     }
+  }
+
+  String _getErrorMessage(String errorMsg) {
+    if (errorMsg.contains('not available') || errorMsg.contains(' unavailable')) {
+      return '当前设备不支持语音识别功能。\n\n可能原因：\n1. 设备系统版本过低\n2. 没有安装语音识别引擎\n3. 系统语言不是中文\n\n建议：\n1. 确保系统语言设置为中文\n2. 检查系统设置中的语音识别功能\n3. 或使用文字输入与AI对话';
+    }
+    if (errorMsg.contains('permission') || errorMsg.contains('Permission')) {
+      return '麦克风权限被拒绝。请前往手机设置开启权限后重试。';
+    }
+    if (errorMsg.contains('network') || errorMsg.contains('Network')) {
+      return '语音识别需要网络连接，请检查网络设置。';
+    }
+    return '语音服务错误: $errorMsg';
   }
 
   void _updateState(SpeechState newState) {
@@ -140,6 +124,11 @@ class SpeechService {
 
     if (_state == SpeechState.listening) {
       return true;
+    }
+
+    if (!_isInitialized) {
+      onError?.call('语音服务未初始化，请重启应用');
+      return false;
     }
 
     _lastWords = '';
